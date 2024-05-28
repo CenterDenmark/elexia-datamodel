@@ -1,0 +1,6 @@
+.metadata/
+*.org/
+TopBraid/
+.project
+catalog-v001.xml
+*.diagrams
