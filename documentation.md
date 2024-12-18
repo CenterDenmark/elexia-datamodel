@@ -19,8 +19,6 @@
 4. [Relations](#relations)
 5. [API Reference](#api-reference)
 
-
-
 This documentation describes the physical datasets of the data model, including the purpose and structure of each entity, relationships, and specific guidelines for defining properties and units of measure. This is intended for sharing on GitHub and provides complete details for all entities.
 
 ---
@@ -32,6 +30,7 @@ This documentation describes the physical datasets of the data model, including 
 - **Relationships**:
 
   - All relationships (except those involving `PropertyValue` and `PropertyValueInterval`) are stored in a dedicated `Relations` table. Each row in the `Relations` table specifies:
+
     - `entityFrom`: The UUID of the source entity.
     - `entity_classFrom`: The type of the source entity (e.g., `Building`, `Device`).
     - `entityTo`: The UUID of the target entity.
@@ -213,6 +212,10 @@ Represents a measurable event where a `Device` measures a specific `Property`.
 ### Address
 
 Defines a postal address associated with entities like `Building` or `Organisation`.
+
+- **Definition**
+
+  - The entity is defined based on [https://schema.org/address](https://schema.org/address).
 
 - **Attributes**:
 
