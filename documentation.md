@@ -364,5 +364,7 @@ For interacting with the data model, the following API endpoints are used:
 
 **Swagger Documentation**: [API Documentation](https://api.centerdenmark.com/swagger-ui/index.html#/)
 
+**Portal**: [User interface for API](https://portal.centerdenmark.com/)
+
 ---
 
