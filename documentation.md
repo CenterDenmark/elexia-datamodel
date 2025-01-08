@@ -114,7 +114,7 @@ Represents a physical structure.
   - `type`: Always `"Building"`.
   - `name`, `description`: General metadata.
   - `livingArea`, `businessArea`: Areas in square meters.
-  - `owner`, `source`, `dateCreated`, `dateModified`: Metadata fields.
+  - `source`, `dateCreated`, `dateModified`: Metadata fields.
 
 - **Reference**:
 
