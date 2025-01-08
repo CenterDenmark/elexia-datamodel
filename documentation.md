@@ -42,9 +42,11 @@ This documentation describes the physical datasets of the data model, including 
   Example of a `Relations` entry:
 
   ```
-  entityFrom: Building123, entity_classFrom: Building
-  entityTo: Space456, entity_classTo: BuildingSpace
-  type: hasSpace
+  {
+  "entityFrom": "Building123", "entity_classFrom": "Building"
+  "entityTo": "Space456", "entity_classTo": "BuildingSpace"
+  "type": "hasSpace"
+  }
   ```
 
 - **Timestamps**: All timestamps follow the XSD datetime standard (ISO8601 format).
@@ -62,22 +64,25 @@ A `Property` represents a measurable or observable attribute, such as temperatur
 - **Definition**:
   - **QUDT Quantity Kinds**: Properties are based on the [QUDT Quantity Kinds vocabulary](https://www.qudt.org/doc/DOC_VOCAB-QUANTITY-KINDS.html#Instances).
 
-* **Attributes**:
+- **Attributes**:
+  - `id`: Unique identifier.
+  - `type`: Always "Property".
+  - `name`: Descriptive name.
+  - `description`: Additional context.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
-  - `id` (UUID): Unique identifier for the property.
-  - `type`: Always `"Property"`.
-  - `name`: A descriptive name (e.g., `"Temperature"`) aligned with QUDT terminology.
-  - `description`: Additional context or details.
-  - `dateCreated`, `dateModified`: Metadata fields.
-
-* **Example**:
-
-  ```
-  id: Property001
-  type: Property
-  name: "Temperature"
-  description: "Represents the thermal state of an object"
-  ```
+- **Example**:
+```
+{
+  "id": "Property001",
+  "type": "Property",
+  "name": "Temperature",
+  "description": "Thermal state of an object",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ### UnitOfMeasure
 
@@ -86,19 +91,23 @@ Represents the unit used to measure a `Property`.
 - **Definition**:
   - Units must be based on the [QUDT Units vocabulary](https://www.qudt.org/doc/DOC_VOCAB-UNITS.html).
 
-* **Attributes**:
+- **Attributes**:
+  - `id`: Unique identifier.
+  - `name`: Name based on QUDT Units.
+  - `description`: Unit details.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
-  - `id` (UUID): Unique identifier for the unit.
-  - `name`: Corresponds to the URI name in the QUDT Units vocabulary, i.e. the name for ampere is "A".
-  - `description`: Details about the unit.
-
-* **Example**:
-
-  ```
-  id: Unit001
-  name: "DEG_C"
-  description: "Degrees Celsius, a measure of temperature"
-  ```
+- **Example**:
+```json
+{
+  "id": "Unit001",
+  "name": "DEG_C",
+  "description": "Degrees Celsius",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -109,26 +118,32 @@ Represents the unit used to measure a `Property`.
 Represents a physical structure.
 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Always `"Building"`.
-  - `name`, `description`: General metadata.
-  - `livingArea`, `businessArea`: Areas in square meters.
-  - `source`, `dateCreated`, `dateModified`: Metadata fields.
+  - `id`: Unique identifier.
+  - `type`: Always "Building".
+  - `name`: Building name.
+  - `description`: Metadata.
+  - `livingArea`: Area in square meters.
+  - `businessArea`: Area in square meters.
+  - `source`: Data source.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Reference**:
 
   - Based on attributes from [Smart Data Models S4BLDG/Building](https://github.com/smart-data-models/dataModel.S4BLDG/blob/master/Building/schema.json).
 
 - **Example**:
-
-  ```
-  id: Building123
-  type: Building
-  name: "Office Building A"
-  livingArea: 1000.0
-  businessArea: 500.0
-  ```
+```json
+{
+  "id": "Building123",
+  "type": "Building",
+  "name": "Office Building A",
+  "livingArea": 1000.0,
+  "businessArea": 500.0,
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -137,27 +152,34 @@ Represents a physical structure.
 Defines spatial elements of a building and supports hierarchical relationships.
 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Always `"BuildingSpace"`.
-  - `name`, `alternateName`, `description`, `area`, `airVolume`.
-  - `buildingSpaceKind`: Specifies the type (e.g., `"Room"`, `"Storey"`).
-  - `source`, `dataProvider`, `dateCreated`, `dateModified`.
+  - `id`: Unique identifier.
+  - `type`: Always "BuildingSpace".
+  - `name`: Space name.
+  - `alternateName`: Alternative name.
+  - `area`: Area in square meters.
+  - `airVolume`: Volume in cubic meters.
+  - `buildingSpaceKind`: Type of space.
+  - `source`: Data source.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Reference**:
 
   - Based on attributes from [Smart Data Models S4BLDG/BuildingSpace](https://github.com/smart-data-models/dataModel.S4BLDG/blob/master/BuildingSpace/schema.json).
 
 - **Example**:
-
-  ```
-  id: Space001
-  type: BuildingSpace
-  name: "Conference Room"
-  area: 50.0
-  airVolume: 150.0
-  buildingSpaceKind: "Room"
-  ```
+```json
+{
+  "id": "Space001",
+  "type": "BuildingSpace",
+  "name": "Conference Room",
+  "area": 50.0,
+  "airVolume": 150.0,
+  "buildingSpaceKind": "Room",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -166,24 +188,31 @@ Defines spatial elements of a building and supports hierarchical relationships.
 Represents a physical device.
 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Specifies the type (e.g., `"Meter"`).
-  - `name`, `description`, `dateInstalled`, `status`.
-  - `source`, `dateCreated`, `dateModified`.
+  - `id`: Unique identifier.
+  - `type`: Device type (e.g., "Meter").
+  - `name`: Device name.
+  - `description`: Metadata.
+  - `dateInstalled`: Installation date.
+  - `status`: Device status.
+  - `source`: Data source.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Reference**:
 
   - Based on [SAREF Device](https://saref.etsi.org/core/v3.2.1/#saref\:Device).
 
 - **Example**:
-
-  ```
-  id: Device123
-  type: Meter
-  name: "Electric Meter"
-  description: "Measures electricity usage"
-  ```
+```json
+{
+  "id": "Device123",
+  "type": "Meter",
+  "name": "Electric Meter",
+  "description": "Measures electricity usage",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -192,20 +221,24 @@ Represents a physical device.
 Represents a measurable event where a `Device` measures a specific `Property`.
 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Always `"Observation"`.
-  - `description`, `temporalType` (e.g., `"Interval"`, `"Instant"`).
-  - `dateCreated`, `dateModified`: Metadata.
+  - `id`: Unique identifier.
+  - `type`: Always "Observation".
+  - `description`: Metadata.
+  - `temporalType`: Interval or Instant.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Example**:
-
-  ```
-  id: Obs001
-  type: Observation
-  description: "Temperature measurement"
-  temporalType: "Instant"
-  ```
+```json
+{
+  "id": "Obs001",
+  "type": "Observation",
+  "description": "Temperature measurement",
+  "temporalType": "Instant",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -218,24 +251,31 @@ Defines a postal address associated with entities like `Building` or `Organisati
   - The entity is defined based on [https://schema.org/address](https://schema.org/address).
 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Always `"PostalAddress"`.
-  - `streetAddress`, `streetNr`, `addressLocality`, `addressRegion`, `postalCode`, `addressCountry`, `postOfficeBoxNumber`.
-  - `district`, `source`, `dateCreated`, `dateModified`.
+  - `id`: Unique identifier.
+  - `type`: Always "PostalAddress".
+  - `streetAddress`: Street name.
+  - `streetNr`: Street number.
+  - `addressLocality`: Locality.
+  - `postalCode`: Postal code.
+  - `addressCountry`: Country.
+  - `district`: District.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Example**:
-
-  ```
-  id: Address001
-  type: PostalAddress
-  streetAddress: "123 Main St"
-  streetNr: "456"
-  addressLocality: "Springfield"
-  addressRegion: "IL"
-  postalCode: "62704"
-  addressCountry: "USA"
-  ```
+```json
+{
+  "id": "Address001",
+  "type": "PostalAddress",
+  "streetAddress": "123 Main St",
+  "streetNr": "456",
+  "addressLocality": "Springfield",
+  "postalCode": "62704",
+  "addressCountry": "USA",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -244,40 +284,48 @@ Defines a postal address associated with entities like `Building` or `Organisati
 Represents a geographic or administrative area associated with buildings or organisations.
 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Always `"Site"`.
-  - `name`, `description`, `source`, `dateCreated`, `dateModified`.
+  - `id`: Unique identifier.
+  - `type`: Always "Site".
+  - `name`: Site name.
+  - `description`: Metadata.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Example**:
-
-  ```
-  id: Site001
-  type: Site
-  name: "Downtown Area"
-  description: "Central business district"
-  ```
+```json
+{
+  "id": "Site001",
+  "type": "Site",
+  "name": "Industrial Park",
+  "description": "Industrial development zone",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
 ### Location
 
 Defines a spatial location associated with other entities.
-
+ 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Always `"Location"`.
+  - `id`: Unique identifier.
+  - `type`: Always "Location".
   - `value`: A GeoJSON string representing the location.
-  - `source`, `dateCreated`, `dateModified`.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Example**:
-
-  ```
-  id: Location001
-  type: Location
-  value: "{\"type\": \"Point\", \"coordinates\": [39.7817, -89.6501]}"
-  ```
+```json
+{
+  "id": "Location001",
+  "type": "Location",
+  "value": "{\"type\": \"Point\", \"coordinates\": [55.6761, 12.5683]}",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -286,21 +334,24 @@ Defines a spatial location associated with other entities.
 Represents an organisation that owns or manages entities such as `Building` or `Site`.
 
 - **Attributes**:
-
-  - `id` (UUID): Unique identifier.
-  - `type`: Always `"Organisation"`.
-  - `name`, `description`, `address`, `contactPoint`, `source`, `dateCreated`, `dateModified`.
+  - `id`: Unique identifier.
+  - `type`: Always "Organisation".
+  - `name`: Organisation name.
+  - `description`: Metadata.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Example**:
-
-  ```
-  id: Organisation001
-  type: Organisation
-  name: "Green Energy Co."
-  description: "A company focused on renewable energy solutions."
-  address: "Address001"
-  contactPoint: "info@greenenergy.com"
-  ```
+```json
+{
+  "id": "Org001",
+  "type": "Organisation",
+  "name": "Green Energy Co.",
+  "description": "Renewable energy solutions",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -309,19 +360,22 @@ Represents an organisation that owns or manages entities such as `Building` or `
 Stores the results of an observation.
 
 - **Attributes**:
-
-  - `procedureExecution`: Links to the observation.
+  - `procedureExecution`: Linked observation.
   - `value`: Measured value.
-  - `timestamp`: When the value was recorded.
-  - `source`, `dateCreated`, `dateModified`.
+  - `timestamp`: Measurement time.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
 
 - **Example**:
-
-  ```
-  procedureExecution: Obs001
-  value: 22.5
-  timestamp: 2024-06-16T12:00:00Z
-  ```
+```json
+{
+  "procedureExecution": "Obs001",
+  "value": 22.5,
+  "timestamp": "2024-01-01T12:00:00Z",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -329,21 +383,24 @@ Stores the results of an observation.
 
 Defines relationships between entities.
 
-- **Columns**:
+- **Attributes**:
+  - `entityFrom`: Source entity.
+  - `entity_classFrom`: Source class.
+  - `entityTo`: Target entity.
+  - `entity_classTo`: Target class.
+  - `type`: Relationship type.
 
-  - `entityFrom`, `entity_classFrom`: Source entity and its type.
-  - `entityTo`, `entity_classTo`: Target entity and its type.
-  - `type`: Type of relationship.
 
-- **Example**:
-
-  ```
-  entityFrom: Device123
-  entity_classFrom: Device
-  entityTo: Obs001
-  entity_classTo: Observation
-  type: madeExecution
-  ```
+**Example**:
+```json
+{
+  "entityFrom": "Device123",
+  "entity_classFrom": "Device",
+  "entityTo": "Obs001",
+  "entity_classTo": "Observation",
+  "type": "madeExecution"
+}
+```
 
 ---
 
