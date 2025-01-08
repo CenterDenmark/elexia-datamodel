@@ -67,6 +67,7 @@ Relations {
 Building {
     %% Should have the same attributes as https://github.com/smart-data-models/dataModel.S4BLDG/Building/schema.json
     %% Note that any nested values should be represented as relationships
+    %% Owner should simply reference an Organisation thorugh relations table
     uuid id PK
     %% areaServed is still unclear and untillk further clarified, should simply be Null
     string areaServed
@@ -77,7 +78,6 @@ Building {
     %% The following two attributes are extra compared to Smart Data Models
     float livingArea
     float businessArea
-    string owner
     string source
     string dateCreated
     string dateModified
