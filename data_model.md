@@ -208,6 +208,8 @@ UnitOfMeasure {
     %% name: This should correspond to the name after unit: in the readable lookup
     string name
     string description
+    string dateCreated
+    string dateModified
 }
 
 Observation {
