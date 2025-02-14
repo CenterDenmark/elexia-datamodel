@@ -52,6 +52,8 @@ This documentation describes the physical datasets of the data model, including 
 - **Timestamps**: All timestamps follow the XSD datetime standard (ISO8601 format).
 
 - **Attributes**: Each entity's attributes are described below, with references where applicable.
+- **Ids**: All id columns should contain UUID to ensure uniqueness in values.
+- **Primary keys**: For all non-timeseries datasets the primary key of the dataset consists of ["id","dateModified"]. This is because updates are appended as described in (#api-reference).
 
 ---
 
@@ -421,6 +423,10 @@ For interacting with the data model, the following API endpoints are used:
    ```
    /api/v1/dataset/timeseries/{datasetId}
    ```
+
+### Updating existing rows
+
+New updates for an entity are appended as a new row with the same id, but a different dateModified.
 
 **Swagger Documentation**: [API Documentation](https://api.centerdenmark.com/swagger-ui/index.html#/)
 
