@@ -167,7 +167,7 @@ Add address details to entities where relevant.
 }
 ```
 
-#### Example: Adding an Address for the Apartment
+#### Example: Adding an Address for the Apartment (a BuildingSpace)
 ```json
 {
   "id": "Address002",
@@ -205,14 +205,13 @@ Add address details to entities where relevant.
 
 Ensure that all entities and relationships are correctly defined:
 
-- **Apartment to Meter**: Use `type: contains`.
+- **BuildingSpace to Meter**: Use `type: contains`.
 - **Property to Observation**: Use `type: isObservedBy`.
 - **Meter to Observation**: Use `type: madeExecution`.
 - **Observation to UnitOfMeasure**: Use `type: isUnitOf`.
-- **BuildingSpace to Building**: Use `type: hasSpace`.
-- **Apartment to Storey**: Use `type: hasSpace`.
+- **Building to BuildingSpace**: Use `type: hasSpace`.
 - **Building to Address**: Use `type: hasAddress`.
-- **Apartment to Address**: Use `type: hasAddress`.
+- **BuildingSpace to Address**: Use `type: hasAddress`.
 - **Organisation to Building**: Use `type: owns`.
 
 ### 6. Verify and Update Existing Entities
