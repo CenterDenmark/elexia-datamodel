@@ -31,6 +31,8 @@ Building }o--|| Site: hasSite
 
 Organisation }|--o| Site: isOwnedBy
 
+Organisation ||--o{ Device: owns
+
 Address }|--o| Site: hasAddress
 
 %% isLocationOf is the inverse of hasLocation
@@ -138,7 +140,7 @@ Site {
 Location {
     uuid id PK
     string type
-    string value
+    geojson value
     string source
     string dateCreated
     string dateModified
@@ -227,11 +229,22 @@ Observation {
 Meter {
     %% Subclass of device and has all the relations a device has
     uuid id PK
-    %% type: Must be Meter. Is mandatory
+    string dateInstalled
+}
+
+Sensor {
+    %% Subclass of device and has all the relations a device has
+    uuid id PK
+    string dateInstalled
+}
+
+Device {
+    %% Subclass of device and has all the relations a device has
+    uuid id PK
+    %% type: Meter, HVAC, ect. Corresponds to the child class name
     string type
     string name
     string description
-    string dateInstalled
     string status
     string source
     %% The dates below refer to creation and modification in this model
