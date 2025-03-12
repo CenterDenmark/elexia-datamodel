@@ -17,7 +17,7 @@ Observation }|--|| Property: isObservedBy
 Observation }|--|| Device: madeExecution
 
 %%Device }|--|| DeviceType: deviceSubClass
-Device }|--|| DeviceKind: hasDeviceKind
+Device }|--o| DeviceKind: hasDeviceKind
 
 Device }o--o| Building: contains
 
@@ -38,7 +38,7 @@ Address }|--o| Site: hasAddress
 %% isLocationOf is the inverse of hasLocation
 Building }o--|| Location: isLocationOf
 
-Device }o--|| Location: isLocationOf
+Device }o--o| Location: isLocationOf
 
 BuildingSpace }o--|| Location: isLocationOf
 
