@@ -219,6 +219,10 @@ Observation {
     %% This maps devices with multiple timeseries based on property and unit of measure. Example is a district heating meter, which measures forward temperature and return temperature, i.e. the property is Temperature and the unit of measure is celsius.
     uuid id PK
     string type
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind
+    string aggregationKind
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/
+    string accumulationKind
     string description
     string dateCreated
     string dateModified
@@ -241,7 +245,7 @@ Sensor {
 Device {
     %% Subclass of device and has all the relations a device has
     uuid id PK
-    %% type: Meter, HVAC, ect. Corresponds to the child class name
+    %% type: Meter, HVAC, ect. Corresponds to the child
     string type
     string name
     string description
