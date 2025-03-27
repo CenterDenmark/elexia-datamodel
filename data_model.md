@@ -14,6 +14,10 @@ Observation }|--|| UnitOfMeasure: isUnitOf
 
 Observation }|--|| Property: isObservedBy
 
+Observation }|--|| AccumulationKind: isKindOf
+
+Observation }|--|| AggregationKind: isKindOf
+
 Observation }|--|| Device: madeExecution
 
 %%Device }|--|| DeviceType: deviceSubClass
@@ -219,15 +223,23 @@ Observation {
     %% This maps devices with multiple timeseries based on property and unit of measure. Example is a district heating meter, which measures forward temperature and return temperature, i.e. the property is Temperature and the unit of measure is celsius.
     uuid id PK
     string type
-    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind
-    string aggregationKind
-    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/
-    string accumulationKind
     string description
     string dateCreated
     string dateModified
     %% temporalType: should be Interval or Instant. Property values for instant types are stored in PropertyValue
     string temporalType
+}
+
+AccumulationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/
+    uuid id PK
+    str name
+}
+
+AggregationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind
+    uuid id PK
+    str name
 }
 
 Meter {
