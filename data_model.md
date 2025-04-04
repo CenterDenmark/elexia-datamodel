@@ -25,6 +25,12 @@ Device }|--o| DeviceKind: hasDeviceKind
 
 Device }o--o| Building: contains
 
+WeatherStation ||--|| WeatherArea: measuresArea
+
+Device }o--o| WeatherArea: contains
+
+Building }o--o| WeatherArea: contains
+
 Device }o--o| BuildingSpace: contains
 
 BuildingSpace }o--|| Building: hasSpace
@@ -85,8 +91,8 @@ Building {
     float livingArea
     float businessArea
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 BuildingSpace {
@@ -116,8 +122,8 @@ BuildingSpace {
     string source
     %%dataProvider: A sequence of characters identifying the provider of the harmonised data entity. Example from Github "IFC file"
     string dataProvider
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Organisation {
@@ -127,8 +133,8 @@ Organisation {
     string description
     string contactPoint
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Site {
@@ -137,8 +143,8 @@ Site {
     string name
     string description
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Location {
@@ -146,8 +152,8 @@ Location {
     string type
     geojson value
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Address {
@@ -168,8 +174,8 @@ Address {
     %% district: A district is a type of administrative division that, in some countries, is managed by the local government
     string district
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 PropertyValue {
@@ -179,8 +185,8 @@ PropertyValue {
     %% datetime: is always either the specific time of the observation or the end time where the value is for instance averaged since the last time. It should be a xsd datetime
     datetime timestamp
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 PropertyValueInterval {
@@ -192,8 +198,8 @@ PropertyValueInterval {
     %% endTime: the beginning of the interval. It should be an xsd datetime
     datetime endTime
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Property {
@@ -204,8 +210,8 @@ Property {
     %% name: should correspond to the name after quantityKind: in the associated link
     string name
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 UnitOfMeasure {
@@ -214,8 +220,8 @@ UnitOfMeasure {
     %% name: This should correspond to the name after unit: in the readable lookup
     string name
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Observation {
@@ -224,8 +230,8 @@ Observation {
     uuid id PK
     string type
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
     %% temporalType: should be Interval or Instant. Property values for instant types are stored in PropertyValue
     string temporalType
 }
@@ -245,13 +251,52 @@ AggregationKind {
 Meter {
     %% Subclass of device and has all the relations a device has
     uuid id PK
-    string dateInstalled
+    datetime dateInstalled
 }
 
 Sensor {
     %% Subclass of device and has all the relations a device has
     uuid id PK
-    string dateInstalled
+    datetime dateInstalled
+}
+
+Photovoltaic {
+    %% Subclass of device and has all the relations a device has
+    uuid id PK
+    str name
+    %% In kW
+    float installedPower
+    float efficiency
+    datetime dateInstalled
+}
+
+WeatherStation {
+    %% Subclass of device and has all the relations a device has
+    uuid id PK
+    str name
+    datetime dateInstalled
+}
+
+%%HVAC {
+%%    %% Subclass of device and has all the relations a device has
+%%    uuid id PK
+%%    str name
+%%    datetime dateInstalled
+%%}
+
+WeatherArea {
+    uuid id PK
+    str name
+    str description
+    str type
+}
+
+DeviceSubclasses {
+    entity Meter
+    entity Sensor
+    entity WeatherStation
+    entity HVAC
+    entity Photovoltaics
 }
 
 Device {
@@ -264,8 +309,8 @@ Device {
     string status
     string source
     %% The dates below refer to creation and modification in this model
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 DeviceKind {
@@ -276,8 +321,8 @@ DeviceKind {
     string modelName
     string manufacturer
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 %%DeviceType {
@@ -287,8 +332,8 @@ DeviceKind {
 %%    string description
 %%    string category
 %%    string source
-%%    string dateCreated
-%%    string dateModified
+%%    datetime dateCreated
+%%    datetime dateModified
 %%}
 
 
