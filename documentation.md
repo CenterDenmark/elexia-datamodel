@@ -439,6 +439,8 @@ An API for mapping between existing ids and data lake ids is being developed [he
 
 *At time of writing, the MQTT broker is still being tested and is not yet available for public use.*
 
+MQTT is only for timeseries data (PropertyValue).
+
 The mqtt broker for the project can be connected to on the following address:
 
 ```bash
