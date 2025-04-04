@@ -2,22 +2,25 @@
 
 ## Table of Contents
 
-1. [How to Read the Data Model](#how-to-read-the-data-model)
-2. [Clarifications for Properties and Units of Measure](#clarifications-for-properties-and-units-of-measure)
-   - [Property](#property)
-   - [UnitOfMeasure](#unitofmeasure)
-3. [Entities](#entities)
-   - [Building](#building)
-   - [BuildingSpace](#buildingspace)
-   - [Device](#device)
-   - [Observation](#observation)
-   - [Address](#address)
-   - [Site](#site)
-   - [Location](#location)
-   - [Organisation](#organisation)
-   - [PropertyValue](#propertyvalue)
-4. [Relations](#relations)
-5. [API Reference](#api-reference)
+- [Data Model Documentation](#data-model-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [How to Read the Data Model](#how-to-read-the-data-model)
+  - [Clarifications for Properties and Units of Measure](#clarifications-for-properties-and-units-of-measure)
+    - [Property](#property)
+    - [UnitOfMeasure](#unitofmeasure)
+  - [Entities](#entities)
+    - [Building](#building)
+    - [BuildingSpace](#buildingspace)
+    - [Device](#device)
+    - [Observation](#observation)
+    - [Address](#address)
+    - [Site](#site)
+    - [Location](#location)
+    - [Organisation](#organisation)
+    - [PropertyValue](#propertyvalue)
+    - [Relations](#relations)
+  - [API Reference](#api-reference)
+  - [MQTT Reference](#mqtt-reference)
 
 This documentation describes the physical datasets of the data model, including the purpose and structure of each entity, relationships, and specific guidelines for defining properties and units of measure. This is intended for sharing on GitHub and provides complete details for all entities.
 
@@ -410,26 +413,44 @@ Defines relationships between entities.
 
 For interacting with the data model, the following API endpoints are used:
 
-1. **Relational Data**:\
+1. **Post Data**:\
    POST data to:
 
    ```
-   /api/v1/dataset/relational/{datasetId}
+   /api/v1/dataset/{datasetId}
    ```
 
-2. **Timeseries Data** (`PropertyValue` and `PropertyValueInterval`):\
-   POST data to:
+2. **Upsert Data**:\
+   PUT data to:
 
    ```
-   /api/v1/dataset/timeseries/{datasetId}
+   /api/v1/dataset/{datasetId}
    ```
-
-### Updating existing rows
-
-New updates for an entity are appended as a new row with the same id, but a different dateModified.
 
 **Swagger Documentation**: [API Documentation](https://api.centerdenmark.com/swagger-ui/index.html#/)
 
 **Portal**: [User interface for API](https://portal.centerdenmark.com/)
 
 ---
+
+## MQTT Reference
+
+The mqtt broker for the project can be connected to on the following address:
+
+```bash
+mqtt://mqtt.centerdenmark.com:8883
+```
+
+Authentication is required and uses token-based credentials integrated with the Center Denmark portal:
+ * Username: The token ID
+ * Password: The token itself
+
+The token can be generated in the [portal](https://portal.centerdenmark.com/en-US/tokens). \
+You can find a guide [here](https://portal.centerdenmark.com/en-US/help/token-management/token-creation).
+
+The topic should ideally be:
+```bash
+{PropertyValueDatasetId}/{OrganisationId}/{BuildingId}/{BuildingSpaceId}/{DeviceId}/{PropertyId}
+```
+
+If this is not possible, please reach out to Center Denmark for assistance.
