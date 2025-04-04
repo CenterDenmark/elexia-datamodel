@@ -20,7 +20,7 @@
     - [PropertyValue](#propertyvalue)
     - [Relations](#relations)
   - [API Reference](#api-reference)
-  - [MQTT Reference](#mqtt-reference)
+  - [MQTT Reference (WIP)](#mqtt-reference-wip)
 
 This documentation describes the physical datasets of the data model, including the purpose and structure of each entity, relationships, and specific guidelines for defining properties and units of measure. This is intended for sharing on GitHub and provides complete details for all entities.
 
@@ -411,7 +411,7 @@ Defines relationships between entities.
 
 ## API Reference
 
-For interacting with the data model, the following API endpoints are used:
+For interacting with specific tables in the data model, the following API endpoints are used:
 
 1. **Post Data**:\
    POST data to:
@@ -431,9 +431,13 @@ For interacting with the data model, the following API endpoints are used:
 
 **Portal**: [User interface for API](https://portal.centerdenmark.com/)
 
+An API for mapping between existing ids and data lake ids is being developed [here](https://transform.centerdenmark.com/swagger-ui/index.html). This api also allows posting complex json objects such that the user does not need to post individual entities to each table. 
+
 ---
 
-## MQTT Reference
+## MQTT Reference (WIP)
+
+*At time of writing, the MQTT broker is still being tested and is not yet available for public use.*
 
 The mqtt broker for the project can be connected to on the following address:
 
