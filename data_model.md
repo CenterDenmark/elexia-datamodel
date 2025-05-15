@@ -20,6 +20,24 @@ Observation }|--|| AggregationKind: isKindOf
 
 Observation }|--|| Device: madeExecution
 
+ForecastData }|--|| Forecast: hasResult
+
+Forecast }|--|| Device: hasForecast
+
+Forecast }|--|| Building: hasForecast
+
+Forecast }|--|| BuildingSpace: hasForecast
+
+Forecast }|--|| Site: hasForecast
+
+Forecast }|--|| UnitOfMeasure: isUnitOf
+
+Forecast }|--|| Property: isForecastedBy
+
+Forecast }|--|| AccumulationKind: isKindOf
+
+Forecast }|--|| AggregationKind: isKindOf
+
 %%Device }|--|| DeviceType: deviceSubClass
 Device }|--o| DeviceKind: hasDeviceKind
 
@@ -117,7 +135,7 @@ BuildingSpace {
     %% area: in m2
     float area
     string description
-    %% BuildingSpace can be 1 of [ BuildingElementProxy, BuildingStorey, Column, Covering, CurtainWall, Door, OpeningElement, Plate, Railing, Roof, Site, Slab, Space, Stair, StairFlight, Storey, Wall, WallStandardCase, Window ]
+    %% BuildingSpaceKind can be 1 of [ BuildingElementProxy, BuildingStorey, Column, Covering, CurtainWall, Door, OpeningElement, Plate, Railing, Roof, Site, Slab, Space, Stair, StairFlight, Storey, Wall, WallStandardCase, Window ]
     string buildingSpaceKind
     string source
     %%dataProvider: A sequence of characters identifying the provider of the harmonised data entity. Example from Github "IFC file"
@@ -265,9 +283,21 @@ Photovoltaic {
     uuid id PK
     str name
     %% In kW
-    float installedPower
+    float maxP
+    float minP
+    %% A percentage
     float efficiency
+    %% Are ranges static?
+    float inclinationRange
+    float orientationRange
+    %% Not exactly sure how to represent the following two. Should be observations/actuations on the PV
+    float availabilityMeasurement
+    float curtailmentMeasurement
     datetime dateInstalled
+}
+
+ElectricVehicle {
+    uuid id PK
 }
 
 WeatherStation {
@@ -292,6 +322,7 @@ WeatherArea {
 }
 
 DeviceSubclasses {
+    entity ElectricVehicle
     entity Meter
     entity Sensor
     entity WeatherStation
@@ -325,16 +356,22 @@ DeviceKind {
     datetime dateModified
 }
 
-%%DeviceType {
-%%    uuid id PK
-%%    string type
-%%    string name
-%%    string description
-%%    string category
-%%    string source
-%%    datetime dateCreated
-%%    datetime dateModified
-%%}
+Forecast {
+    uuid id PK
+    string name
+    string modelType
+    string modelVersion
+}
+
+ForecastData {
+    %% Foreign key of forecast
+    uuid forecast FK
+    float value
+    datetime timestamp
+    string source
+    datetime dateCreated
+    datetime dateModified
+}
 
 
 ````
