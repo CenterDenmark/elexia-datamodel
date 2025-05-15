@@ -4,7 +4,7 @@ This repo contains the data model to be used in the Elexia project. In the curre
 
 ## Physical data model
 
-The physical data model is visualized [here](data_model.md) and documentation is exists [here](documentation.md). For a guide on how to add data to the different datasets please refer to [guide.md](guide.md).
+The physical data model is visualized [here](data_model.md) and documentation is exists [here](documentation.md). For a guide on how to add data to the different datasets please refer to [this](/guides/data%20provider/transformation_endpoints_guide.md).
 
 ## Ontology
 To work with and edit the ontology, several tools exist amongst which are:
