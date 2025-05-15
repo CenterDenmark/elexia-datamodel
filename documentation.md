@@ -120,8 +120,8 @@ Represents the unit used to measure a `Property`.
 Represents a physical structure.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Building".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Building".
   - `name`: Building name.
   - `description`: Metadata.
   - `livingArea`: Area in square meters.
@@ -154,13 +154,13 @@ Represents a physical structure.
 Defines spatial elements of a building and supports hierarchical relationships.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "BuildingSpace".
+  - `id*`: Unique identifier.
+  - `type*`: Always "BuildingSpace".
   - `name`: Space name.
   - `alternateName`: Alternative name.
   - `area`: Area in square meters.
   - `airVolume`: Volume in cubic meters.
-  - `buildingSpaceKind`: Type of space.
+  - `buildingSpaceKind*`: Type of space. This can be any of those in the reference.
   - `source`: Data source.
   - `dateCreated`: Creation timestamp.
   - `dateModified`: Last modification timestamp.
@@ -177,7 +177,7 @@ Defines spatial elements of a building and supports hierarchical relationships.
   "name": "Conference Room",
   "area": 50.0,
   "airVolume": 150.0,
-  "buildingSpaceKind": "Room",
+  "buildingSpaceKind": "Space",
   "dateCreated": "2024-01-01T00:00:00Z",
   "dateModified": "2024-01-01T00:00:00Z"
 }
@@ -190,8 +190,8 @@ Defines spatial elements of a building and supports hierarchical relationships.
 Represents a physical device.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Device type (e.g., "Meter").
+  - `id*`: Unique identifier.
+  - `type*`: Device type (e.g., "Meter").
   - `name`: Device name.
   - `description`: Metadata.
   - `dateInstalled`: Installation date.
@@ -223,8 +223,8 @@ Represents a physical device.
 Represents a measurable event where a `Device` measures a specific `Property`.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Observation".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Observation".
   - `description`: Metadata.
   - `temporalType`: Interval or Instant.
   - `dateCreated`: Creation timestamp.
@@ -253,9 +253,9 @@ Defines a postal address associated with entities like `Building` or `Organisati
   - The entity is defined based on [https://schema.org/address](https://schema.org/address).
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "PostalAddress".
-  - `streetAddress`: Street name.
+  - `id*`: Unique identifier.
+  - `type*`: Always "PostalAddress".
+  - `streetAddress*`: Street name.
   - `streetNr`: Street number.
   - `addressLocality`: Locality.
   - `postalCode`: Postal code.
@@ -283,11 +283,11 @@ Defines a postal address associated with entities like `Building` or `Organisati
 
 ### Site
 
-Represents a geographic or administrative area associated with buildings or organisations.
+Represents a geographic or administrative area associated with buildings or organisations. In the Elexia project, this would be a Pilot Site.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Site".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Site".
   - `name`: Site name.
   - `description`: Metadata.
   - `dateCreated`: Creation timestamp.
@@ -312,8 +312,8 @@ Represents a geographic or administrative area associated with buildings or orga
 Defines a spatial location associated with other entities.
  
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Location".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Location".
   - `value`: A GeoJSON string representing the location.
   - `dateCreated`: Creation timestamp.
   - `dateModified`: Last modification timestamp.
@@ -336,8 +336,8 @@ Defines a spatial location associated with other entities.
 Represents an organisation that owns or manages entities such as `Building` or `Site`.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Organisation".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Organisation".
   - `name`: Organisation name.
   - `description`: Metadata.
   - `dateCreated`: Creation timestamp.
@@ -362,20 +362,16 @@ Represents an organisation that owns or manages entities such as `Building` or `
 Stores the results of an observation.
 
 - **Attributes**:
-  - `procedureExecution`: Linked observation.
-  - `value`: Measured value.
-  - `timestamp`: Measurement time.
-  - `dateCreated`: Creation timestamp.
-  - `dateModified`: Last modification timestamp.
+  - `procedureExecution*`: Linked observation.
+  - `value*`: Measured value.
+  - `timestamp*`: Measurement time.
 
 - **Example**:
 ```json
 {
   "procedureExecution": "Obs001",
   "value": 22.5,
-  "timestamp": "2024-01-01T12:00:00Z",
-  "dateCreated": "2024-01-01T00:00:00Z",
-  "dateModified": "2024-01-01T00:00:00Z"
+  "timestamp": "2024-01-01T12:00:00Z"
 }
 ```
 
@@ -408,27 +404,15 @@ Defines relationships between entities.
 
 ## API Reference
 
-For interacting with the data model, the following API endpoints are used:
+For interacting with the data model, it is reccomended to use the tranformation endpoints, but each entity also has its own base endpoint for direct interaction.
 
-1. **Relational Data**:\
-   POST data to:
+- For guide on how to add data, please refer to [this guide](/guides/data%20provider/transformation_endpoints_guide.md) 
+- For more info on how base endpoints work, refer to [this guide](/guides/base_endpoints_guide.md)
 
-   ```
-   /api/v1/dataset/relational/{datasetId}
-   ```
-
-2. **Timeseries Data** (`PropertyValue` and `PropertyValueInterval`):\
-   POST data to:
-
-   ```
-   /api/v1/dataset/timeseries/{datasetId}
-   ```
-
-### Updating existing rows
-
-New updates for an entity are appended as a new row with the same id, but a different dateModified.
-
-**Swagger Documentation**: [API Documentation](https://api.centerdenmark.com/swagger-ui/index.html#/)
+**Swagger Documentation**: 
+  
+  - [Base Endpoints](https://api.centerdenmark.com/swagger-ui/index.html#/)
+  - [Transformation Endpoints](https://transform.centerdenmark.com/swagger-ui/index.html#/)
 
 **Portal**: [User interface for API](https://portal.centerdenmark.com/)
 
