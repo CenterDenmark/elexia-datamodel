@@ -41,7 +41,7 @@ Endpoints that provide context (e.g., listing all devices or observations for a 
 
 ### Field Flexibility
 
-In the Swagger documentation, all fields for entities are displayed. However, it is not necessary to include all fields when posting data if they are not relevant. For example, if a `Device` does not have a specific address, the `Address` object may be omitted.
+In the Swagger documentation, all fields for entities are displayed. However, it is not necessary to include all fields when posting data if they are not relevant. For example, if a `Device` does not have a specific location, the `Location` object may be omitted.
 
 For fields within objects, refer to this guide to determine which fields are required.
 
