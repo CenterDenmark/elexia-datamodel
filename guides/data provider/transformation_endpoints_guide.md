@@ -97,6 +97,8 @@ You **must not** specify multiple levels at once (e.g., both `building` and `bui
 
 This step can be repeated to add additional buildings at any time. Like other entities, re-posting a building with new fields or updated relations (e.g., new buildingSpaces) will update the existing record rather than create a duplicate.
 
+Use the endpoint /api/elexia/transformation/building
+
 This step creates the building and its associated rooms and walls. The building will be connected to a site in the next step.
 
 ```json
@@ -146,6 +148,8 @@ This step creates the building and its associated rooms and walls. The building 
 > When available, it will allow posting a site and referencing any buildings it contains using `sourceId`.
 > The `organisationName` inside the `buildings` list does **not** need to match the root `organisationName`. It refers to the organisation responsible for each referenced building.
 
+Use the endpoint /api/elexia/transformation/site
+
 ```json
 {
   "organisationName": "dataprovider_v3",
@@ -168,6 +172,8 @@ This step creates the building and its associated rooms and walls. The building 
 > **Note:** The UUIDs used in the `properties` array (e.g., `propertyId`, `unitOfMeasureId`, `accumulationKindId`, `aggregationKindId`) must refer to existing rows in the corresponding tables in the Center Denmark portal. These values must be looked up in the portal to ensure the correct semantics for each device's observations. (A link to the portal will be added here.)
 
 > **Source ID Mapping:** The `sourceId` is the identifier used by the data provider (specified via `organisationName`). Internally, this combination of `sourceId` and `organisationName` is mapped to a UUID. In all places where existing objects are referenced using `sourceId` and `organisationName`, it is also possible to reference them directly using the internal UUID (`id`) maintained by the API.
+
+Use the endpoint /api/elexia/transformation/device
 
 You can post multiple devices in a single request. The following example includes three devices:
 
@@ -289,7 +295,7 @@ You can post multiple devices in a single request. The following example include
 
 ## Step 4: Add Device Data
 
-This step shows how to send actual observations to the devices. Each entry contains the device `sourceId`, the `organisationName`, and a list of timestamped values for the device's registered properties.
+This step shows how to send actual observations to the devices. Each entry contains the device `sourceId`, the `organisationName`, and a list of timestamped values for the device's registered properties. Use the endpoint /api/elexia/transformation/device/data.
 
 ```json
 [
@@ -332,11 +338,13 @@ This step shows how to send actual observations to the devices. Each entry conta
 
 ## Step 5: Query Device Data
 
-This step demonstrates how to query data for a specific device using the `/api/elexia/transformation/device/data/query` endpoint. This endpoint allows you to retrieve time series data for a device's observations.
+This step demonstrates how to query data for a specific device or retrieve all observations in a site and query data using observation IDs.
 
-### Example Request
+### Sub-step 1: Query Data for a Specific Device
 
-The following example retrieves data for the device `dev_sensor_v3` for a specific time range:
+This sub-step shows how to query data for a specific device using the `/api/elexia/transformation/device/data/query` endpoint.
+
+#### Example Request
 
 ```json
 {
@@ -345,5 +353,74 @@ The following example retrieves data for the device `dev_sensor_v3` for a specif
   "startTime": "2025-05-06T08:00:00Z",
   "endTime": "2025-05-06T09:00:00Z"
 }
+```
 
-This allows you to verify that the data has been successfully added for a specific device and is accessible via the API.
+#### Example Response
+
+```json
+{
+  "sourceId": "dev_sensor_v3",
+  "organisationName": "dataprovider_v3",
+  "data": [
+    {
+      "time": "2025-05-06T08:00:00Z",
+      "values": [
+        {
+          "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+          "value": 22.1
+        },
+        {
+          "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+          "value": 46.5
+        }
+      ]
+    },
+    {
+      "time": "2025-05-06T09:00:00Z",
+      "values": [
+        {
+          "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+          "value": 22.4
+        },
+        {
+          "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+          "value": 47.0
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Sub-step 2: Retrieve Observations for a Site and Query Data
+
+This sub-step demonstrates how to retrieve all observations in a site using the `/api/elexia/transformation/site/observations` endpoint and then query data using the observation IDs with the `/api/elexia/transformation/device/data/query/id` endpoint.
+
+#### Step 1: Retrieve Observations for a Site
+
+Use the `/api/elexia/transformation/site/{sourceId}/{organisationName}/observations` endpoint to get all observations for a site.
+
+##### Example Request
+
+```json
+{
+  "sourceId": "site_demo_v3",
+  "organisationName": "dataprovider_v3"
+}
+```
+
+#### Step 2: Query Data Using Observation IDs
+
+Use the `/api/elexia/transformation/device/data/query/id` endpoint to query data for the retrieved observation IDs.
+
+##### Example Request
+
+```json
+{
+  "observationIds": ["obs_energy_123", "obs_climate_456"],
+  "startTime": "2025-05-06T08:00:00Z",
+  "endTime": "2025-05-06T09:00:00Z"
+}
+```
+
+This sub-step allows you to retrieve all observations for a site and query data for those observations.
