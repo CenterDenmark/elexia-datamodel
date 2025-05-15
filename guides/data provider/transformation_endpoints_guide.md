@@ -12,12 +12,13 @@
 4. [Step 2: Add Location Information (Sites)](#step-2-add-location-information-sites)
 5. [Step 3: Add Devices](#step-3-add-devices)
 6. [Step 4: Add Device Data](#step-4-add-device-data)
+7. [Step 5: Query Device Data](#step-5-query-device-data)
 
 ## General Concepts
 
 ### Access & Onboarding
 
-To access the Center Denmark API and portal, begin at [https://portal.centerdenmark.com/en-US/help](https://portal.centerdenmark.com/en-US/help). Contact the API provider by email to request access as a data provider, data consumer, or both. Once approved, you’ll receive access to a **dataset group** containing all entities relevant to your role. You can explore the data interactively in the portal or use our [swagger](https://transform.centerdenmark.com/swagger-ui/index.html#/). Access begins with a **test group** for experimenting with dummy data. When you're ready, you can request access to a **production group** and reuse the same workflow.
+To access the Center Denmark API and portal, begin at [https://portal.centerdenmark.com/en-US/help](https://portal.centerdenmark.com/en-US/help). Contact the API provider by email to request access as a data provider, data consumer, or both. Once approved, you’ll receive access to a **dataset group** containing all entities relevant to your role. You can explore the data interactively in the portal. Access begins with a **test group** for experimenting with dummy data and the API service is given [here](https://test-transform.centerdenmark.com/swagger-ui/index.html). When you're ready, you can request access to a **production group** and reuse the same workflow, but with [this API service](https://transform.centerdenmark.com/swagger-ui/index.html#/).
 
 After access is granted, you must generate an access token via the portal. This token must include **read** and/or **write** access to the entities in your dataset group:
 
@@ -324,3 +325,23 @@ This step shows how to send actual observations to the devices. Each entry conta
   }
 ]
 ```
+
+---
+
+## Step 5: Query Device Data
+
+This step demonstrates how to query data for a specific device using the `/api/elexia/transformation/device/data/query` endpoint. This endpoint allows you to retrieve time series data for a device's observations.
+
+### Example Request
+
+The following example retrieves data for the device `dev_sensor_v3` for a specific time range:
+
+```json
+{
+  "sourceId": "dev_sensor_v3",
+  "organisationName": "dataprovider_v3",
+  "startTime": "2025-05-06T08:00:00Z",
+  "endTime": "2025-05-06T09:00:00Z"
+}
+
+This allows you to verify that the data has been successfully added for a specific device and is accessible via the API.
