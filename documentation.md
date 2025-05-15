@@ -404,7 +404,9 @@ Defines relationships between entities.
 
 ## API Reference
 
-For interacting with the data model, it is reccomended to use the tranformation endpoints, but each entity also has its own base endpoint for direct interaction.
+For interacting with the data model, it is reccomended to use the tranformation endpoints, but each entity also has its own base endpoint for direct interaction. Use this diagram as reference:
+
+![d1](/res/API_interaction_diagram.drawio.png)
 
 - For guide on how to add data, please refer to [this guide](/guides/data%20provider/transformation_endpoints_guide.md) 
 - For more info on how base endpoints work, refer to [this guide](/guides/base_endpoints_guide.md)
