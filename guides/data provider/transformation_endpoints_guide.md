@@ -155,7 +155,9 @@ This step creates the building and its associated rooms and walls. The building 
     "name": "Demo Prosumer Site v3",
     "description": "Prosumer site"
   },
-  "buildings": [{ "sourceId": "bld_demo_v3" }]
+  "buildings": [{ "sourceId": "bld_demo_v3",
+                  "organisationName": "dataprovider_v3" // Is not needed if it is the same as organisationName in the root
+              }]
 }
 ```
 
