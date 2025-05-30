@@ -6,7 +6,7 @@ erDiagram
 
 PropertyValue }|--|| Observation: hasResult
 
-PropertyValueInterval }|--|| Observation: hasResult
+%%PropertyValueInterval }|--|| Observation: hasResult
 
 
 %% isMeasuredIn is the inverse
@@ -20,34 +20,36 @@ Observation }|--|| AggregationKind: isKindOf
 
 Observation }|--|| Device: madeExecution
 
-ForecastData }|--|| Forecast: hasResult
+ForecastObservation }|--|| ForecastModel: madeExecution
 
-Forecast }|--|| Device: hasForecast
+ForecastData }|--|| ForecastObservation: hasResult
 
-Forecast }|--|| Building: hasForecast
+ForecastModel }|--|| Device: hasForecast
 
-Forecast }|--|| BuildingSpace: hasForecast
+ForecastModel }|--|| Building: hasForecast
 
-Forecast }|--|| Site: hasForecast
+ForecastModel }|--|| BuildingSpace: hasForecast
 
-Forecast }|--|| UnitOfMeasure: isUnitOf
+ForecastModel }|--|| Site: hasForecast
 
-Forecast }|--|| Property: isForecastedBy
+ForecastModel }o--o| WeatherArea: hasForecast
 
-Forecast }|--|| AccumulationKind: isKindOf
+ForecastObservation }|--|| UnitOfMeasure: isUnitOf
 
-Forecast }|--|| AggregationKind: isKindOf
+ForecastObservation }|--|| Property: isForecastedBy
+
+ForecastObservation }|--|| AccumulationKind: isKindOf
+
+ForecastObservation }|--|| AggregationKind: isKindOf
 
 %%Device }|--|| DeviceType: deviceSubClass
 Device }|--o| DeviceKind: hasDeviceKind
 
 Device }o--o| Building: contains
 
-WeatherStation ||--|| WeatherArea: measuresArea
-
 Device }o--o| WeatherArea: contains
 
-Building }o--o| WeatherArea: contains
+Site }o--o| WeatherArea: contains
 
 Device }o--o| BuildingSpace: contains
 
@@ -207,18 +209,18 @@ PropertyValue {
     datetime dateModified
 }
 
-PropertyValueInterval {
-    %% Foreign key can map to any subclass of ProcedureExecution
-    uuid procedureExecution FK
-    float value
-    %% startTime: the beginning of the interval. It should be an xsd datetime
-    datetime startTime
-    %% endTime: the beginning of the interval. It should be an xsd datetime
-    datetime endTime
-    string source
-    datetime dateCreated
-    datetime dateModified
-}
+%%PropertyValueInterval {
+%%    %% Foreign key can map to any subclass of ProcedureExecution
+%%    uuid procedureExecution FK
+%%    float value
+%%    %% startTime: the beginning of the interval. It should be an xsd datetime
+%%    datetime startTime
+%%    %% endTime: the beginning of the interval. It should be an xsd datetime
+%%    datetime endTime
+%%    string source
+%%    datetime dateCreated
+%%    datetime dateModified
+%%}
 
 Property {
     %% Defined by https://www.qudt.org/doc/DOC_VOCAB-QUANTITY-KINDS.html#Instances
@@ -300,13 +302,6 @@ ElectricVehicle {
     uuid id PK
 }
 
-WeatherStation {
-    %% Subclass of device and has all the relations a device has
-    uuid id PK
-    str name
-    datetime dateInstalled
-}
-
 %%HVAC {
 %%    %% Subclass of device and has all the relations a device has
 %%    uuid id PK
@@ -356,21 +351,29 @@ DeviceKind {
     datetime dateModified
 }
 
-Forecast {
+ForecastModel {
     uuid id PK
     string name
     string modelType
     string modelVersion
+    %% ISO 8601 compliant
+    string period
+}
+
+ForecastObservation {
+    uuid id PK
+    string type
+    datetime dateCreated
+    datetime dateModified
 }
 
 ForecastData {
     %% Foreign key of forecast
-    uuid forecast FK
+    uuid procedureExecution FK
     float value
     datetime timestamp
-    string source
-    datetime dateCreated
-    datetime dateModified
+    %% What is the most optimal format for implementation
+    string version
 }
 
 
