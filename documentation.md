@@ -13,6 +13,9 @@
     - [BuildingSpace](#buildingspace)
     - [Device](#device)
     - [Observation](#observation)
+    - [ForecastModel](#forecastmodel)
+    - [ForecastObservation](#forecastobservation)
+    - [ForecastData](#forecastdata)
     - [Address](#address)
     - [Site](#site)
     - [Location](#location)
@@ -244,6 +247,76 @@ Represents a measurable event where a `Device` measures a specific `Property`.
   "dateModified": "2024-01-01T00:00:00Z"
 }
 ```
+
+---
+
+### ForecastModel
+
+Represents a forecasting model that produces forecasted values for properties at sites, buildings, or devices.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Model name.
+  - `modelType`: Type of model (e.g., "ARIMA", "ML").
+  - `modelVersion`: Version string.
+  - `period`: ISO 8601 period string for forecast interval.
+
+- **Example**:
+```json
+{
+  "id": "ForecastModel001",
+  "name": "WeatherForecastModel",
+  "modelType": "ML",
+  "modelVersion": "1.0.0",
+  "period": "P1D"
+}
+```
+
+---
+
+### ForecastObservation
+
+Represents a forecasted observation for a property, produced by a forecast model.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `type*`: Always "ForecastObservation".
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Example**:
+```json
+{
+  "id": "ForecastObs001",
+  "type": "ForecastObservation",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+---
+
+### ForecastData
+
+Stores the forecasted values for a forecast observation.
+
+- **Attributes**:
+  - `procedureExecution*`: Linked forecast observation.
+  - `value*`: Forecasted value.
+  - `timestamp*`: Forecasted time.
+  - `version*`: Integer version. For each (`procedureExecution`, `timestamp`) pair, a new forecast value must have a strictly higher version than any previous value for that timestamp.
+
+- **Example**:
+```json
+{
+  "procedureExecution": "ForecastObs001",
+  "value": 18.5,
+  "timestamp": "2024-01-02T12:00:00Z",
+  "version": 1
+}
+```
+
+> **Note:** If a new forecast value is delivered for a specific `procedureExecution` and `timestamp`, the `version` must be incremented (it must be strictly higher than the previous value for that timestamp).
 
 ---
 
