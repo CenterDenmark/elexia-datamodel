@@ -13,6 +13,7 @@
 5. [Step 3: Add Devices](#step-3-add-devices)
 6. [Step 4: Add Device Data](#step-4-add-device-data)
 7. [Step 5: Query Device Data](#step-5-query-device-data)
+8. [Step 6: Forecasting Data](#step-6-forecasting-data)
 
 ## General Concepts
 
@@ -67,8 +68,11 @@ flowchart TD
   Site["Site: site_demo_v3"] --> Building["Building: bld_demo_v3"]
   Building --> Office["BuildingSpace: space_office_v3"]
   Building --> Server["BuildingSpace: space_server_v3"]
+  Building --> Wall["BuildingSpace: wall_server_office_v3"]
   Office --> Meter["Device: dev_meter_v3"]
   Server --> Sensor["Device: dev_sensor_v3"]
+  Office --> Wall["BuildingSpace: wall_server_office_v3"]
+  Server --> Wall["BuildingSpace: wall_server_office_v3"]
   Site --> Standalone["Device: dev_standalone_v3"]
   Meter -->|observes| Energy["Observations: Energy & Power"]
   Sensor -->|observes| Climate["Observations: Temp & Humidity"]
@@ -82,6 +86,7 @@ The API uses a structured model of:
 * **BuildingSpaces**: Rooms, walls, sections inside buildings
 * **Devices**: Sensors/meters linked to one of the above
 * **Properties**: What a device measures (e.g. temperature, power)
+* **Forecasts**: Forecasted values for properties at sites, buildings, or devices
 
 Devices must be linked to only **one level** of location:
 
@@ -424,3 +429,99 @@ Use the `/api/elexia/transformation/device/data/query/id` endpoint to query data
 ```
 
 This sub-step allows you to retrieve all observations for a site and query data for those observations.
+
+---
+
+## Step 6: Forecasting Data
+
+This step demonstrates how to post and query forecasting data using the transformation endpoints.
+
+### Posting a Forecast Model
+
+Use the endpoint `/api/elexia/transformation/forecastmodel` to post a new forecast model.
+
+```json
+{
+  "name": "WeatherForecastModel",
+  "modelType": "ML",
+  "modelVersion": "1.0.0",
+  "period": "P1D"
+}
+```
+
+### Posting a Forecast Observation
+
+Use the endpoint `/api/elexia/transformation/forecastobservation` to post a forecast observation for a property.
+
+```json
+{
+  "type": "ForecastObservation",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+### Posting Forecast Data
+
+Use the endpoint `/api/elexia/transformation/forecastdata` to post forecasted values.
+
+> **Note:** The `version` field must be an integer. For each (`procedureExecution`, `timestamp`) pair, a new forecast value must have a strictly higher version than any previous value for that timestamp.
+
+```json
+[
+  {
+    "procedureExecution": "ForecastObs001",
+    "value": 18.5,
+    "timestamp": "2024-01-02T12:00:00Z",
+    "version": 1
+  },
+  {
+    "procedureExecution": "ForecastObs001",
+    "value": 19.0,
+    "timestamp": "2024-01-02T13:00:00Z",
+    "version": 1
+  },
+  {
+    "procedureExecution": "ForecastObs001",
+    "value": 18.7,
+    "timestamp": "2024-01-02T12:00:00Z",
+    "version": 2
+  }
+]
+```
+
+### Querying Forecast Data
+
+You can query forecast data using the `/api/elexia/transformation/forecastdata/query` endpoint.
+
+#### Example Request
+
+```json
+{
+  "procedureExecution": "ForecastObs001",
+  "startTime": "2024-01-02T12:00:00Z",
+  "endTime": "2024-01-02T13:00:00Z"
+}
+```
+
+#### Example Response
+
+```json
+{
+  "procedureExecution": "ForecastObs001",
+  "data": [
+    {
+      "timestamp": "2024-01-02T12:00:00Z",
+      "value": 18.7,
+      "version": 2
+    },
+    {
+      "timestamp": "2024-01-02T13:00:00Z",
+      "value": 19.0,
+      "version": 1
+    }
+  ]
+}
+```
+
+This allows you to post and retrieve forecasted values for properties, supporting advanced analytics and planning.
