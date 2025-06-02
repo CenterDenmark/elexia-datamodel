@@ -308,9 +308,6 @@ ForecastData {
     uuid procedureExecution FK
     float value
     datetime timestamp
-    %% What is the most optimal format for implementation
-    string version
+    %% version: Must be an integer. For each (procedureExecution, timestamp) pair, a new forecast value must have a strictly higher version than any previous value for that timestamp.
+    int version
 }
-
-
-````
