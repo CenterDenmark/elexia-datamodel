@@ -14,7 +14,31 @@ Observation }|--|| UnitOfMeasure: isUnitOf
 
 Observation }|--|| Property: isObservedBy
 
+Observation }|--|| AccumulationKind: isKindOf
+
+Observation }|--|| AggregationKind: isKindOf
+
 Observation }|--|| Device: madeExecution
+
+ForecastObservation }|--|| ForecastModel: madeExecution
+
+ForecastData }|--|| ForecastObservation: hasResult
+
+ForecastModel }|--|| Device: hasForecast
+
+ForecastModel }|--|| Building: hasForecast
+
+ForecastModel }|--|| BuildingSpace: hasForecast
+
+ForecastModel }|--|| Site: hasForecast
+
+ForecastObservation }|--|| UnitOfMeasure: isUnitOf
+
+ForecastObservation }|--|| Property: isForecastedBy
+
+ForecastObservation }|--|| AccumulationKind: isKindOf
+
+ForecastObservation }|--|| AggregationKind: isKindOf
 
 %%Device }|--|| DeviceType: deviceSubClass
 Device }|--|| DeviceKind: hasDeviceKind
@@ -190,6 +214,18 @@ PropertyValueInterval {
     string dateModified
 }
 
+AccumulationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/
+    uuid id PK
+    str name
+}
+
+AggregationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind
+    uuid id PK
+    str name
+}
+
 Property {
     %% Defined by https://www.qudt.org/doc/DOC_VOCAB-QUANTITY-KINDS.html#Instances
     uuid id PK
@@ -251,16 +287,30 @@ DeviceKind {
     string dateModified
 }
 
-%%DeviceType {
-%%    uuid id PK
-%%    string type
-%%    string name
-%%    string description
-%%    string category
-%%    string source
-%%    string dateCreated
-%%    string dateModified
-%%}
+ForecastModel {
+    uuid id PK
+    string name
+    string modelType
+    string modelVersion
+    %% ISO 8601 compliant
+    string period
+}
+
+ForecastObservation {
+    uuid id PK
+    string type
+    datetime dateCreated
+    datetime dateModified
+}
+
+ForecastData {
+    %% Foreign key of forecast
+    uuid procedureExecution FK
+    float value
+    datetime timestamp
+    %% What is the most optimal format for implementation
+    string version
+}
 
 
 ````
