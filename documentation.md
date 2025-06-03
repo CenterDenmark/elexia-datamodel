@@ -252,7 +252,7 @@ Represents a measurable event where a `Device` measures a specific `Property`.
 
 ### ForecastModel
 
-Represents a forecasting model that produces forecasted values for properties at sites, buildings, or devices.
+Represents a forecasting model that produces forecasted values for properties at sites, buildings, building spaces or devices.
 
 - **Attributes**:
   - `id*`: Unique identifier.

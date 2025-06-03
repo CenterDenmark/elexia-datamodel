@@ -100,6 +100,13 @@ Devices must be linked to only **one level** of location:
 
 You **must not** specify multiple levels at once (e.g., both `building` and `buildingSpace`).
 
+Forecasts must be linked to only one of
+
+- `site`
+- `building`
+- `buildingspace`
+- `device`
+
 ---
 
 ## Step 1: Add Location Information (Buildings and Spaces)
