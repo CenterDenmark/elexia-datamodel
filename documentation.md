@@ -81,7 +81,7 @@ A `Property` represents a measurable or observable attribute, such as temperatur
   - `dateModified`: Last modification timestamp.
 
 - **Example**:
-```
+```json
 {
   "id": "Property001",
   "type": "Property",
@@ -259,20 +259,21 @@ Represents a forecasting model that produces forecasted values for properties at
   - `name`: Model name.
   - `modelType`: Type of model (e.g., "ARIMA", "ML").
   - `modelVersion`: Version string.
-  - `period`: ISO 8601 period string for forecast interval.
+  - `period`: ISO 8601 period string indicating the period that each forecast will cover (e.g., "PT3H" for a 3-hour forecast horizon).
 
 - **Example**:
 ```json
 {
-  "id": "ForecastModel001",
-  "name": "WeatherForecastModel",
+  "id": "forecast_weather_v3",
+  "organisationName": "dataprovider_v3",
+  "name": "Weather Forecast Model v3",
   "modelType": "ML",
   "modelVersion": "1.0.0",
-  "period": "P1D"
+  "period": "PT3H"
 }
 ```
 
----
+--- 
 
 ### ForecastObservation
 
@@ -283,12 +284,19 @@ Represents a forecasted observation for a property, produced by a forecast model
   - `type*`: Always "ForecastObservation".
   - `dateCreated`: Creation timestamp.
   - `dateModified`: Last modification timestamp.
+  - `propertyId`, `unitOfMeasureId`, `accumulationKindId`, `aggregationKindId`: As defined in the ForecastModel's properties array.
+
+- **Note**: Normally, forecast observations are created automatically when posting a ForecastModel with a `properties` array.
 
 - **Example**:
 ```json
 {
   "id": "ForecastObs001",
   "type": "ForecastObservation",
+  "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+  "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+  "accumulationKindId": "15e95acc-48b7-4756-a264-c0cac5461125",
+  "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
   "dateCreated": "2024-01-01T00:00:00Z",
   "dateModified": "2024-01-01T00:00:00Z"
 }
