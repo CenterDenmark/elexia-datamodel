@@ -13,6 +13,7 @@
 5. [Step 3: Add Devices](#step-3-add-devices)
 6. [Step 4: Add Device Data](#step-4-add-device-data)
 7. [Step 5: Query Device Data](#step-5-query-device-data)
+8. [Step 6: Forecasting Data](#step-6-forecasting-data)
 
 ## General Concepts
 
@@ -67,12 +68,19 @@ flowchart TD
   Site["Site: site_demo_v3"] --> Building["Building: bld_demo_v3"]
   Building --> Office["BuildingSpace: space_office_v3"]
   Building --> Server["BuildingSpace: space_server_v3"]
+  Building --> Wall["BuildingSpace: wall_server_office_v3"]
   Office --> Meter["Device: dev_meter_v3"]
   Server --> Sensor["Device: dev_sensor_v3"]
+  Office --> Wall["BuildingSpace: wall_server_office_v3"]
+  Server --> Wall["BuildingSpace: wall_server_office_v3"]
   Site --> Standalone["Device: dev_standalone_v3"]
   Meter -->|observes| Energy["Observations: Energy & Power"]
   Sensor -->|observes| Climate["Observations: Temp & Humidity"]
   Standalone -->|observes| Air["Observations: CO₂ & AbsHumidity"]
+
+  %% Forecast Example
+  Forecast["Forecast: forecast_indoor_temp_v3"] -.->|applies to| Sensor
+  Forecast -->|forecasts| TempProp["Property: Indoor Temperature"]
 ```
 
 The API uses a structured model of:
@@ -82,6 +90,7 @@ The API uses a structured model of:
 * **BuildingSpaces**: Rooms, walls, sections inside buildings
 * **Devices**: Sensors/meters linked to one of the above
 * **Properties**: What a device measures (e.g. temperature, power)
+* **Forecasts**: Forecasted values for properties at sites, buildings, or devices
 
 Devices must be linked to only **one level** of location:
 
@@ -90,6 +99,13 @@ Devices must be linked to only **one level** of location:
 * ✅ `site` → `building` → `buildingSpace`
 
 You **must not** specify multiple levels at once (e.g., both `building` and `buildingSpace`).
+
+Forecasts must be linked to only one of
+
+- `site`
+- `building`
+- `buildingspace`
+- `device`
 
 ---
 
@@ -424,3 +440,217 @@ Use the `/api/elexia/transformation/device/data/query/id` endpoint to query data
 ```
 
 This sub-step allows you to retrieve all observations for a site and query data for those observations.
+
+---
+
+## Step 6: Forecasting Data
+
+This step demonstrates how to post and query forecasting data using the transformation endpoints.
+
+### Posting a Forecast Model
+
+Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast model. The payload structure mimics the Device payload: you must provide `organisationName`, `sourceId`, a `devices` array, and a `properties` array. For each property in the array, a corresponding forecast observation will be created. The `devices` array specifies which device(s) the forecast applies to.
+
+> **Note:** The `period` field is an ISO 8601 duration string that indicates the period that each forecast will cover (e.g., `"PT3H"` means each forecast covers a 3-hour period).
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "sourceId": "forecast_indoor_temp_v3",
+  "name": "Indoor Temperature Forecast Model v3",
+  "modelType": "ML",
+  "modelVersion": "1.0.0",
+  "period": "PT3H",
+  "devices": [
+    {
+      "sourceId": "dev_sensor_v3",
+      "organisationName": "dataprovider_v3"
+    }
+  ],
+  "properties": [
+    {
+      "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", // Indoor Temperature
+      "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3", // Celsius
+      "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d", // Average
+      "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+    }
+  ]
+}
+```
+
+> For each property in the `properties` array, a forecast observation will be created and linked to the forecast model and the specified device(s).
+
+### Posting a Forecast Observation
+
+*Normally, you do not need to post forecast observations directly, as they are created automatically when posting a forecast model with properties.*
+
+### Posting Forecast Data
+
+Use the endpoint `/api/elexia/transformation/forecastdata` to post forecasted values.
+
+> **Note:** The `version` field must be an integer. For each (`sourceId`, `organisationName`, `timestamp`, `propertyId`) combination (identifying the forecast observation and property), a new forecast value must have a strictly higher version than any previous value for that timestamp.
+
+The payload structure for posting forecast data mimics the structure in Step 4 (device data), grouping values by forecast observation and timestamp:
+
+#### First payload (initial forecast):
+
+```json
+[
+  {
+    "sourceId": "forecast_indoor_temp_v3",
+    "organisationName": "dataprovider_v3",
+    "data": [
+      {
+        "time": "2024-01-02T12:00:00Z",
+        "values": [
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5, "version": 1 }
+        ]
+      },
+      {
+        "time": "2024-01-02T13:00:00Z",
+        "values": [
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8, "version": 1 }
+        ]
+      },
+      {
+        "time": "2024-01-02T14:00:00Z",
+        "values": [
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0, "version": 1 }
+        ]
+      }
+    ]
+  }
+]
+```
+
+#### Second payload (updated forecast for same timestamps):
+
+```json
+[
+  {
+    "sourceId": "forecast_indoor_temp_v3",
+    "organisationName": "dataprovider_v3",
+    "data": [
+      {
+        "time": "2024-01-02T12:00:00Z",
+        "values": [
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7, "version": 2 }
+        ]
+      },
+      {
+        "time": "2024-01-02T13:00:00Z",
+        "values": [
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0, "version": 2 }
+        ]
+      },
+      {
+        "time": "2024-01-02T14:00:00Z",
+        "values": [
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3, "version": 2 }
+        ]
+      }
+    ]
+  }
+]
+```
+
+### Getting an Overview of Forecasts for a Device
+
+You can get an overview of all forecasts associated with a device using the following endpoint:
+
+- **Endpoint:** `/api/elexia/transformation/device/{sourceId}/{organisationName}/forecasts`
+- **Method:** `GET`
+
+This will return all forecast models and their associated forecast observations for the specified device.
+
+> **Note:** Similar endpoints exist for other entities:
+> - `/api/elexia/transformation/building/{sourceId}/{organisationName}/forecasts`
+> - `/api/elexia/transformation/buildingspace/{sourceId}/{organisationName}/forecasts`
+> - `/api/elexia/transformation/site/{sourceId}/{organisationName}/forecasts`
+>
+> These endpoints allow you to get an overview of all forecasts linked to a Building, BuildingSpace, or Site.
+
+#### Example Request
+
+```
+GET /api/elexia/transformation/device/dev_sensor_v3/dataprovider_v3/forecasts
+```
+
+#### Example Response
+
+```json
+[
+  {
+    "forecast": {
+      "sourceId": "forecast_indoor_temp_v3",
+      "name": "Indoor Temperature Forecast Model v3",
+      "modelType": "ML",
+      "modelVersion": "1.0.0",
+      "period": "PT3H",
+      "properties": [
+        {
+          "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+          "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+          "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+          "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+        }
+      ]
+    }
+  }
+]
+```
+
+
+### Querying Forecast Data
+
+You can query forecast data using the `/api/elexia/transformation/forecastdata/query` endpoint.
+
+The payload format for querying forecast data matches the format used for querying device data, but uses `forecastId` instead of `deviceId`:
+
+```json
+{
+  "sourceId": "forecast_indoor_temp_v3",
+  "organisationName": "dataprovider_v3",
+  "properties": [
+    "8a4e4cac-e568-4b88-8955-e04f65d81263"
+  ],
+  "startTime": "2024-01-02T12:00:00Z",
+  "endTime": "2024-01-02T15:00:00Z"
+}
+```
+
+#### Example Response
+
+> **Note:** The response returns all versions of forecast values for each timestamp and property.
+
+```json
+{
+  "sourceId": "forecast_indoor_temp_v3",
+  "forecastId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "data": [
+    {
+      "time": "2024-01-02T12:00:00Z",
+      "values": [
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5, "version": 1 },
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7, "version": 2 }
+      ]
+    },
+    {
+      "time": "2024-01-02T13:00:00Z",
+      "values": [
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8, "version": 1 },
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0, "version": 2 }
+      ]
+    },
+    {
+      "time": "2024-01-02T14:00:00Z",
+      "values": [
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0, "version": 1 },
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3, "version": 2 }
+      ]
+    }
+  ]
+}
+```
+
+This allows you to post and retrieve forecasted values for properties, supporting advanced analytics and planning.
