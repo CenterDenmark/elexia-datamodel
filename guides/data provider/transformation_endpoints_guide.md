@@ -631,23 +631,44 @@ The payload format for querying forecast data matches the format used for queryi
     {
       "time": "2024-01-02T12:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5, "version": 1 },
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7, "version": 2 }
-      ]
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5}
+      ],
+      "version": 1
+    },
+    {
+      "time": "2024-01-02T12:00:00Z",
+      "values": [
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7}
+      ],
+      "version": 2
     },
     {
       "time": "2024-01-02T13:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8, "version": 1 },
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0, "version": 2 }
-      ]
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8 },
+      ], 
+      "version": 1
+    },
+    {
+      "time": "2024-01-02T13:00:00Z",
+      "values": [
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 }
+      ], 
+      "version": 2
     },
     {
       "time": "2024-01-02T14:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0, "version": 1 },
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3, "version": 2 }
-      ]
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0}
+      ], 
+      "version": 1 
+    },
+    {
+      "time": "2024-01-02T14:00:00Z",
+      "values": [
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3 }
+      ], 
+      "version": 2
     }
   ]
 }
