@@ -260,6 +260,9 @@ Represents a forecasting model that produces forecasted values for properties at
   - `modelType`: Type of model (e.g., "ARIMA", "ML").
   - `modelVersion`: Version string.
   - `period`: ISO 8601 period string indicating the period that each forecast will cover (e.g., "PT3H" for a 3-hour forecast horizon).
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
 
 - **Example**:
 ```json
@@ -269,7 +272,9 @@ Represents a forecasting model that produces forecasted values for properties at
   "name": "Weather Forecast Model v3",
   "modelType": "ML",
   "modelVersion": "1.0.0",
-  "period": "PT3H"
+  "period": "PT3H",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
 }
 ```
 
