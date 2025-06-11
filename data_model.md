@@ -294,6 +294,8 @@ ForecastModel {
     string modelVersion
     %% ISO 8601 compliant
     string period
+    string dateCreated
+    string dateModified
 }
 
 ForecastObservation {
