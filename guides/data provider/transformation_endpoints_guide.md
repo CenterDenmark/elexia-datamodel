@@ -503,21 +503,24 @@ The payload structure for posting forecast data mimics the structure in Step 4 (
       {
         "time": "2024-01-02T12:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5 }
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5 },
+          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.0 }
         ], 
         "version": 1
       },
       {
         "time": "2024-01-02T13:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8}
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8 },
+          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.0 }
         ], 
         "version": 1 
       },
       {
         "time": "2024-01-02T14:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 }
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
+          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.0 }
         ], 
         "version": 1
       }
@@ -537,21 +540,24 @@ The payload structure for posting forecast data mimics the structure in Step 4 (
       {
         "time": "2024-01-02T12:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7 }
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7 },
+          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.5 }
         ], 
         "version": 2
       },
       {
         "time": "2024-01-02T13:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 }
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
+          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.5 }
         ], 
         "version": 2
       },
       {
         "time": "2024-01-02T14:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3 }
+          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3 },
+          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.5 }
         ], 
         "version": 2
       }
@@ -637,14 +643,16 @@ The payload format for querying forecast data matches the format used for queryi
     {
       "time": "2024-01-02T12:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5}
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5 },
+        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.0 }
       ],
       "version": 1
     },
     {
       "time": "2024-01-02T12:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7}
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7 },
+        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.5 }
       ],
       "version": 2
     },
@@ -652,28 +660,32 @@ The payload format for querying forecast data matches the format used for queryi
       "time": "2024-01-02T13:00:00Z",
       "values": [
         { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8 },
-      ], 
+        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.0 }
+      ],
       "version": 1
     },
     {
       "time": "2024-01-02T13:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 }
-      ], 
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
+        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.5 }
+      ],
       "version": 2
     },
     {
       "time": "2024-01-02T14:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0}
-      ], 
-      "version": 1 
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
+        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.0 }
+      ],
+      "version": 1
     },
     {
       "time": "2024-01-02T14:00:00Z",
       "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3 }
-      ], 
+        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3 },
+        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.5 }
+      ],
       "version": 2
     }
   ]
