@@ -81,6 +81,7 @@ flowchart TD
   %% Forecast Example
   Forecast["Forecast: forecast_indoor_temp_v3"] -.->|applies to| Sensor
   Forecast -->|forecasts| TempProp["Property: Indoor Temperature"]
+  Forecast -->|forecasts| HumidityProp["Property: Humidity"]
 ```
 
 The API uses a structured model of:
@@ -470,6 +471,12 @@ Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast mo
     {
       "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", // Indoor Temperature
       "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3", // Celsius
+      "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d", // Average
+      "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+    },
+    {
+      "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", // Humidity
+      "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12", // (example: %RH)
       "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d", // Average
       "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
     }
