@@ -160,8 +160,7 @@ This step creates the building and its associated rooms and walls. The building 
 
 ## Step 2: Add Location Information (Sites)
 
-> **Note:** This endpoint is planned but not yet implemented.
-> When available, it will allow posting a site and referencing any buildings it contains using `sourceId`.
+> **Note:** 
 > The `organisationName` inside the `buildings` list does **not** need to match the root `organisationName`. It refers to the organisation responsible for each referenced building.
 
 Use the endpoint /api/elexia/transformation/site
