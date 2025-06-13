@@ -13,7 +13,8 @@
 5. [Step 3: Add Devices](#step-3-add-devices)
 6. [Step 4: Add Device Data](#step-4-add-device-data)
 7. [Step 5: Query Device Data](#step-5-query-device-data)
-8. [Step 6: Forecasting Data](#step-6-forecasting-data)
+8. [Step 6: Adding a Weather Area to a Site](#step-6-adding-a-weather-area-to-a-site)
+9. [Step 7: Forecasting Data](#step-7-forecasting-data)
 
 ## General Concepts
 
@@ -66,6 +67,7 @@ These examples are crafted to demonstrate different valid ways of modeling devic
 ```mermaid
 flowchart TD
   Site["Site: site_demo_v3"] --> Building["Building: bld_demo_v3"]
+  Site --> WeatherArea["WeatherArea: weatherarea_rooftop_v3"]
   Building --> Office["BuildingSpace: space_office_v3"]
   Building --> Server["BuildingSpace: space_server_v3"]
   Building --> Wall["BuildingSpace: wall_server_office_v3"]
@@ -74,9 +76,11 @@ flowchart TD
   Office --> Wall["BuildingSpace: wall_server_office_v3"]
   Server --> Wall["BuildingSpace: wall_server_office_v3"]
   Site --> Standalone["Device: dev_standalone_v3"]
+  WeatherArea --> WeatherStation["Device: dev_weatherstation_v3"]
   Meter -->|observes| Energy["Observations: Energy & Power"]
   Sensor -->|observes| Climate["Observations: Temp & Humidity"]
   Standalone -->|observes| Air["Observations: CO₂ & AbsHumidity"]
+  WeatherStation -->|observes| WeatherObs["Observations: Weather"]
 
   %% Forecast Example
   Forecast["Forecast: forecast_indoor_temp_v3"] -.->|applies to| Sensor
@@ -180,8 +184,6 @@ Use the endpoint /api/elexia/transformation/site
               }]
 }
 ```
-
----
 
 ## Step 3: Add Devices
 
@@ -443,7 +445,76 @@ This sub-step allows you to retrieve all observations for a site and query data 
 
 ---
 
-## Step 6: Forecasting Data
+## Step 6: Adding a Weather Area to a Site
+
+A WeatherArea is a spatial region associated with a site, similar to a building. You can add a weather area to a site using the `/api/elexia/transformation/weatherarea` endpoint. The payload is simple:
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "weatherArea": {
+    "sourceId": "weatherarea_rooftop_v3",
+    "type": "WeatherArea",
+    "name": "Rooftop Weather Area",
+    "description": "Weather station area on the rooftop"
+  }
+}
+```
+
+To connect a WeatherArea to a site, include it in the site's list of weather areas:
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "site": {
+    "sourceId": "site_demo_v3",
+    "type": "Site",
+    "name": "Demo Prosumer Site v3",
+    "description": "Prosumer site"
+  },
+  "weatherAreas": [
+    { "sourceId": "weatherarea_rooftop_v3" }
+  ]
+}
+```
+
+> **Note:** A WeatherArea is treated as a location level, just like Building or BuildingSpace. Devices and forecasts may only be connected to a single level of location (site, building, buildingSpace, or weatherArea).
+
+### Adding Devices and Forecasts to a Weather Area
+
+Adding a device to a WeatherArea is done in the same way as for a building or building space, but specify the weatherArea in the device payload:
+
+```json
+{
+  "sourceId": "dev_weatherstation_v3",
+  "organisationName": "dataprovider_v3",
+  "name": "Weather Station v3",
+  "type": {
+    "deviceType": "SENSOR",
+    "dateInstalled": "2024-01-20T00:00:00Z"
+  },
+  "weatherArea": {
+    "sourceId": "weatherarea_rooftop_v3",
+    "type": "WeatherArea"
+  },
+  "properties": [
+    {
+      "propertyId": "weather_temp_property_id",
+      "unitOfMeasureId": "weather_temp_unit_id",
+      "accumulationKindId": "weather_accumulation_id",
+      "aggregationKindId": "weather_aggregation_id"
+    }
+  ]
+}
+```
+
+Adding a forecast for a WeatherArea is done in the same way as for a device, but use the `/api/elexia/transformation/weatherarea/forecast` endpoint and specify the weatherArea in the forecast payload.
+
+> **Note:** Devices and forecasts may only be connected to a single level of location (site, building, buildingSpace, or weatherArea).
+
+---
+
+## Step 7: Forecasting Data
 
 This step demonstrates how to post and query forecasting data using the transformation endpoints.
 
@@ -451,7 +522,7 @@ This step demonstrates how to post and query forecasting data using the transfor
 
 Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast model. The payload structure mimics the Device payload: you must provide `organisationName`, `sourceId`, a `devices` array, and a `properties` array. For each property in the array, a corresponding forecast observation will be created. The `devices` array specifies which device(s) the forecast applies to.
 
-> **Note:** The `period` field is an ISO 8601 duration string that indicates the period that each forecast will cover (e.g., `"PT3H"` means each forecast covers a 3-hour period).
+> **Note:** The `period`, `frequency`, and `interval` fields are ISO 8601 duration strings. `period` indicates the period that each forecast will cover (e.g., `"PT3H"` means each forecast covers a 3-hour period). `frequency` specifies how often forecasts are delivered (if empty, frequency is varying). `interval` specifies the time interval between forecast values (if empty, interval is varying). `description` is a free text field describing the forecast model.
 
 ```json
 {
@@ -461,6 +532,9 @@ Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast mo
   "modelType": "ML",
   "modelVersion": "1.0.0",
   "period": "PT3H",
+  "frequency": "PT1H",
+  "interval": "PT1H",
+  "description": "Forecasts indoor temperature and humidity for Building A in Dokken",
   "devices": [
     {
       "sourceId": "dev_sensor_v3",
