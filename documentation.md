@@ -481,7 +481,7 @@ Defines relationships between entities.
   - `entityTo`: Target entity.
   - `entity_classTo`: Target class.
   - `type`: Relationship type.
-  - `isActive`: Boolean indicating if the relationship is currently active.
+  - `isActive`: Integer (1 = active, 0 = not active) indicating if the relationship is currently active.
 
 **Example**:
 ```json
@@ -491,7 +491,7 @@ Defines relationships between entities.
   "entityTo": "Obs001",
   "entity_classTo": "Observation",
   "type": "madeExecution",
-  "isActive": true
+  "isActive": 1
 }
 ```
 

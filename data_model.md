@@ -85,10 +85,10 @@ Relations {
     str type
     str entity_classFrom
     str entity_classTo
-    bool isActive
+    int isActive %% 1 = active, 0 = not active
     %% Examples:
-    %% <uuid1>, <uuid2>, contains, Building, BuildingSpace, true
-    %% <uuid1>, <uuid2>, owns, Organisation, Building, true
+    %% <uuid1>, <uuid2>, contains, Building, BuildingSpace, 1
+    %% <uuid1>, <uuid2>, owns, Organisation, Building, 1
 }
 
 Building {
