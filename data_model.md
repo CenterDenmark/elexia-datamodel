@@ -60,6 +60,8 @@ Address }|--o| Site: hasAddress
 %% isLocationOf is the inverse of hasLocation
 Building }o--|| Location: isLocationOf
 
+WeatherArea }o--|| Location: isLocationOf
+
 Device }o--|| Location: isLocationOf
 
 BuildingSpace }o--|| Location: isLocationOf
@@ -83,9 +85,10 @@ Relations {
     str type
     str entity_classFrom
     str entity_classTo
+    bool isActive
     %% Examples:
-    %% <uuid1>, <uuid2>, contains, Building, BuildingSpace
-    %% <uuid1>, <uuid2>, owns, Organisation, Building
+    %% <uuid1>, <uuid2>, contains, Building, BuildingSpace, true
+    %% <uuid1>, <uuid2>, owns, Organisation, Building, true
 }
 
 Building {
@@ -319,3 +322,16 @@ ForecastData {
     %% version: Must be an integer. For each (procedureExecution, timestamp) pair, a new forecast value must have a strictly higher version than any previous value for that timestamp.
     int version
 }
+
+WeatherArea {
+    uuid id PK
+    string name
+    string description
+    string dateCreated
+    string dateModified
+}
+
+WeatherArea }o--|| Site: hasSite
+Device }o--o| WeatherArea: contains
+ForecastModel }|--|| WeatherArea: hasForecast
+````

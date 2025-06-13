@@ -481,7 +481,7 @@ Defines relationships between entities.
   - `entityTo`: Target entity.
   - `entity_classTo`: Target class.
   - `type`: Relationship type.
-
+  - `isActive`: Boolean indicating if the relationship is currently active.
 
 **Example**:
 ```json
@@ -490,7 +490,32 @@ Defines relationships between entities.
   "entity_classFrom": "Device",
   "entityTo": "Obs001",
   "entity_classTo": "Observation",
-  "type": "madeExecution"
+  "type": "madeExecution",
+  "isActive": true
+}
+```
+
+---
+
+### WeatherArea
+
+Represents a weather area, which is a spatial region associated with a site. Weather areas can have devices and forecasts connected to them, similar to buildings.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Weather area name.
+  - `description`: Metadata.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Example**:
+```json
+{
+  "id": "WeatherArea001",
+  "name": "Rooftop Weather Area",
+  "description": "Weather station area on the rooftop",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
 }
 ```
 
