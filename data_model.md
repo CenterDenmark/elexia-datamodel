@@ -85,7 +85,8 @@ Relations {
     str type
     str entity_classFrom
     str entity_classTo
-    int isActive %% 1 = active, 0 = not active
+    %% 1 = active, 0 = not active
+    int isActive 
     %% Examples:
     %% <uuid1>, <uuid2>, contains, Building, BuildingSpace, 1
     %% <uuid1>, <uuid2>, owns, Organisation, Building, 1
