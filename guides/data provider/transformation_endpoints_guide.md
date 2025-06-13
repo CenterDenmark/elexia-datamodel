@@ -451,7 +451,7 @@ This step demonstrates how to post and query forecasting data using the transfor
 
 Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast model. The payload structure mimics the Device payload: you must provide `organisationName`, `sourceId`, a `devices` array, and a `properties` array. For each property in the array, a corresponding forecast observation will be created. The `devices` array specifies which device(s) the forecast applies to.
 
-> **Note:** The `period` field is an ISO 8601 duration string that indicates the period that each forecast will cover (e.g., `"PT3H"` means each forecast covers a 3-hour period).
+> **Note:** The `period`, `frequency`, and `interval` fields are ISO 8601 duration strings. `period` indicates the period that each forecast will cover (e.g., `"PT3H"` means each forecast covers a 3-hour period). `frequency` specifies how often forecasts are delivered (if empty, frequency is varying). `interval` specifies the time interval between forecast values (if empty, interval is varying). `description` is a free text field describing the forecast model.
 
 ```json
 {
@@ -461,6 +461,9 @@ Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast mo
   "modelType": "ML",
   "modelVersion": "1.0.0",
   "period": "PT3H",
+  "frequency": "PT1H",
+  "interval": "PT1H",
+  "description": "Forecasts indoor temperature and humidity for Building A in Dokken",
   "devices": [
     {
       "sourceId": "dev_sensor_v3",

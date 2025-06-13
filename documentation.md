@@ -260,9 +260,11 @@ Represents a forecasting model that produces forecasted values for properties at
   - `modelType`: Type of model (e.g., "ARIMA", "ML").
   - `modelVersion`: Version string.
   - `period`: ISO 8601 period string indicating the period that each forecast will cover (e.g., "PT3H" for a 3-hour forecast horizon).
+  - `frequency`: ISO 8601 period string specifying how often forecasts are delivered. If left empty, the frequency is assumed to be varying.
+  - `interval`: ISO 8601 period string specifying the time interval between forecast values. If left empty, the interval is assumed to be varying.
+  - `description`: Free text field describing the forecast model.
   - `dateCreated`: Creation timestamp.
   - `dateModified`: Last modification timestamp.
-
 
 - **Example**:
 ```json
@@ -273,6 +275,9 @@ Represents a forecasting model that produces forecasted values for properties at
   "modelType": "ML",
   "modelVersion": "1.0.0",
   "period": "PT3H",
+  "frequency": "PT1H",
+  "interval": "PT1H",
+  "description": "Forecasts temperature and humidity every hour for the next 3 hours.",
   "dateCreated": "2024-01-01T00:00:00Z",
   "dateModified": "2024-01-01T00:00:00Z"
 }

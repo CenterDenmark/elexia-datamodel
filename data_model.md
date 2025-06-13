@@ -294,6 +294,12 @@ ForecastModel {
     string modelVersion
     %% ISO 8601 compliant
     string period
+    %% ISO 8601 compliant, how often forecasts are delivered. If empty, frequency is varying.
+    string frequency
+    %% ISO 8601 compliant, time interval between forecast values. If empty, interval is varying.
+    string interval
+    %% Free text field describing the forecast model
+    string description
     string dateCreated
     string dateModified
 }
