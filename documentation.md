@@ -533,36 +533,11 @@ For interacting with the data model, it is reccomended to use the tranformation 
 **Swagger Documentation**: 
   
   - [Base Endpoints](https://api.centerdenmark.com/swagger-ui/index.html#/)
-  - [Transformation Endpoints](https://transform.centerdenmark.com/swagger-ui/index.html#/)
+  - [Transformation Endpoints for Prod environment](https://transform.centerdenmark.com/swagger-ui/index.html#/)
+  - [Transformation Endpoints for Test environment](https://test-transform.centerdenmark.com/swagger-ui/index.html#/)
 
 **Portal**: [User interface for API](https://portal.centerdenmark.com/)
 
 An API for mapping between existing ids and data lake ids is being developed [here](https://transform.centerdenmark.com/swagger-ui/index.html). This api also allows posting complex json objects such that the user does not need to post individual entities to each table. 
 
 ---
-
-## MQTT Reference (WIP)
-
-*At time of writing, the MQTT broker is still being tested and is not yet available for public use.*
-
-MQTT is only for timeseries data (PropertyValue).
-
-The mqtt broker for the project can be connected to on the following address:
-
-```bash
-mqtt://mqtt.centerdenmark.com:8883
-```
-
-Authentication is required and uses token-based credentials integrated with the Center Denmark portal:
- * Username: The token ID
- * Password: The token itself
-
-The token can be generated in the [portal](https://portal.centerdenmark.com/en-US/tokens). \
-You can find a guide [here](https://portal.centerdenmark.com/en-US/help/token-management/token-creation).
-
-The topic should ideally be:
-```bash
-{PropertyValueDatasetId}/{OrganisationId}/{BuildingId}/{BuildingSpaceId}/{DeviceId}/{PropertyId}
-```
-
-If this is not possible, please reach out to Center Denmark for assistance.
