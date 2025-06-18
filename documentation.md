@@ -22,8 +22,8 @@
     - [Organisation](#organisation)
     - [PropertyValue](#propertyvalue)
     - [Relations](#relations)
+    - [WeatherArea](#weatherarea)
   - [API Reference](#api-reference)
-  - [MQTT Reference (WIP)](#mqtt-reference-wip)
 
 This documentation describes the physical datasets of the data model, including the purpose and structure of each entity, relationships, and specific guidelines for defining properties and units of measure. This is intended for sharing on GitHub and provides complete details for all entities.
 
