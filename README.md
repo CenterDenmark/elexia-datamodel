@@ -13,3 +13,22 @@ To work with and edit the ontology, several tools exist amongst which are:
 - [TopBraid Composer](https://archive.topquadrant.com/products/topbraid-composer/).
 
 For a complete visual overview of the model, please visit: [Owlgred](http://owlgred.lumii.lv/online_visualization/xqa0)
+
+## Interacting with the platform
+
+We’ve added a step-by-step guide on how to post data via the API, to where navigation links are provided below.
+
+- General documentation on the data model: https://github.com/CenterDenmark/elexia-datamodel/blob/main/documentation.md
+
+- Relevant links for swagger documentation: https://github.com/CenterDenmark/elexia-datamodel/blob/main/documentation.md#api-reference
+
+
+- Requesting access to the API: [Access & Onboarding](https://github.com/CenterDenmark/elexia-datamodel/blob/main/guides/data%20provider/transformation_endpoints_guide.md#access--onboarding)
+
+### Build pilot data structure
+
+- Inspiration example of building the pilot structure: https://github.com/CenterDenmark/elexia-datamodel/blob/main/guides/data%20provider/transformation_endpoints_guide.md#access--onboarding
+
+- Building of pilot structure (step 1-3): https://github.com/CenterDenmark/elexia-datamodel/blob/main/guides/data%20provider/transformation_endpoints_guide.md#step-1-add-location-information-buildings-and-spaces
+
+- Transferring data continuously ​for the pilot structure: https://github.com/CenterDenmark/elexia-datamodel/blob/main/guides/data%20provider/transformation_endpoints_guide.md#step-4-add-device-data
