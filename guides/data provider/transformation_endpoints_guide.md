@@ -15,6 +15,7 @@
 7. [Step 5: Query Device Data](#step-5-query-device-data)
 8. [Step 6: Adding a Weather Area to a Site](#step-6-adding-a-weather-area-to-a-site)
 9. [Step 7: Forecasting Data](#step-7-forecasting-data)
+10. [Step 8: Adding Set Points (States) to Locations and Devices](#step-8-adding-set-points-states-to-locations-and-devices)
 
 ## General Concepts
 
@@ -86,6 +87,9 @@ flowchart TD
   Forecast["Forecast: forecast_indoor_temp_v3"] -.->|applies to| Sensor
   Forecast -->|forecasts| TempProp["Property: Indoor Temperature"]
   Forecast -->|forecasts| HumidityProp["Property: Humidity"]
+
+  %% State Example
+  Wall --> WallState["State: state_wall_thermal_resistance_v3"]
 ```
 
 The API uses a structured model of:
@@ -717,8 +721,7 @@ The payload format for querying forecast data matches the format used for queryi
 
 ```json
 {
-  "sourceId": "forecast_indoor_temp_v3",
-  "forecastId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "data": [
     {
       "time": "2024-01-02T12:00:00Z",
@@ -773,3 +776,71 @@ The payload format for querying forecast data matches the format used for queryi
 ```
 
 This allows you to post and retrieve forecasted values for properties, supporting advanced analytics and planning.
+
+---
+
+## Step 8: Adding Set Points (States) to Locations and Devices
+
+Set points (states) can be added to all location entities (Site, Building, BuildingSpace, WeatherArea) and to devices, but not to forecasts. The setup is similar to that of forecasts and devices.
+
+### Example: Posting a State for a Wall's Thermal Resistance
+
+Suppose you want to set a thermal resistance set point for a wall (building space). This example shows how to post a state and a state value, including all required references, and explicitly lists the endpoints used.
+
+#### 1. Post the State
+
+**Endpoint:** `POST /api/elexia/transformation/state`
+
+> **Note:** The `properties` field must be a single JSON object (not an array), containing the property, unit of measure, accumulation kind, and aggregation kind.
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "state": {
+    "sourceId": "state_wall_thermal_resistance_v3",
+    "type": "State",
+    "name": "Thermal Resistance Setpoint",
+    "description": "Target thermal resistance for shared wall",
+    "buildingSpace": { "sourceId": "wall_shared_v3" },
+    "properties": {
+      "propertyId": "d9a3a205-f71d-4eca-986f-dae225f40958",
+      "unitOfMeasureId": "b1d466d6-0c66-4c92-8d00-5cb36b67581d",
+      "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8",
+      "aggregationKindId": "e16765d1-e91f-4c57-9e5e-41a2ea2be0fd"
+    }
+  }
+}
+```
+
+#### 2. Post State Values
+
+**Endpoint:** `POST /api/elexia/transformation/statevalue`
+
+```json
+[
+  {
+    "sourceId": "state_wall_thermal_resistance_v3",
+    "organisationName": "dataprovider_v3",
+    "value": 2.7,
+    "timestamp": "2024-01-10T12:00:00Z"
+  }
+]
+```
+
+#### 3. Query the Latest State Value Before a Timestamp
+
+**Endpoint:** `POST /api/elexia/transformation/statevalue/last`
+
+```json
+{
+  "sourceId": "state_wall_thermal_resistance_v3",
+  "organisationName": "dataprovider_v3",
+  "timestamp": "2024-01-09T12:00:00Z"
+}
+```
+
+This will return the latest value for the state before or at the given timestamp.
+
+> **Note:** The `properties` field for State must be a single object, not an array, and must include propertyId, unitOfMeasureId, accumulationKindId, and aggregationKindId.
+
+- **Returns:** The latest value for the state before or at the given timestamp.
