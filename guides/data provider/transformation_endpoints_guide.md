@@ -50,7 +50,7 @@ For all non-timeseries data, POST requests are handled as upserts, i.e. if the s
 
 In the Swagger documentation, all fields for entities are displayed. However, it is not necessary to include all fields when posting data if they are not relevant. For example, if a `Device` does not have a specific location, the `Location` object may be omitted.
 
-For fields within objects, refer to this guide to determine which fields are required.
+For fields within objects, refer to [this guide](/documentation.md) to determine which fields are required. If on intends to not deliver values for an optional fields then that fiels should be left out of the json object rather than being delivered as NULL.
 
 **Note**: In the current version, the __type__ field must always be provided. However, in future versions, this will no longer be mandatory except for `Device` entities.
 
