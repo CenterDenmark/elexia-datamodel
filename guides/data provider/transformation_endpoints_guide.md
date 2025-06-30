@@ -28,19 +28,23 @@ After access is granted, you must generate an access token via the portal. This 
 > * **Write access** is required only for data providers.
 > * **Write access is never needed** for static entities (such as properties).
 
+### Identifier Mapping
+
+All entities in this guide are posted using `sourceId` and `organisationName`. This combination uniquely identifies records as defined by the data provider. Internally, the API maps this pair to a stable UUID (`id`) used for referencing objects. You may use either method (sourceId + organisationName or UUID) for referencing existing objects, but when creating new objects one should always use sourceId + organisationName.
+
 ### Entity Behavior
 
 > **Entity updates:** If an entity is posted again with the same `sourceId` and `organisationName`, any updated field values will overwrite the existing data. This allows updates to previously posted entities. To add relations (e.g., link a site to a new building), simply post the entity again with the additional relations included.
 
 > **Static entities:** Some entities — particularly those under `properties` such as `Property`, `UnitOfMeasure`, `AccumulationKind`, and `AggregationKind` — are managed centrally by the API provider. These values are predefined and cannot be changed by users. They must be selected from the lookup tables available via the portal.
 
-### Identifier Mapping
-
-All entities in this guide are posted using `sourceId` and `organisationName`. This combination uniquely identifies records as defined by the data provider. Internally, the API maps this pair to a stable UUID (`id`) used for referencing objects. You may use either method (sourceId + organisationName or UUID) for referencing existing objects.
-
 ### Performance
 
 Endpoints that provide context (e.g., listing all devices or observations for a site or building) are significantly slower than endpoints that return only time series data. These context endpoints should be used **infrequently** to retrieve the necessary observation or device identifiers. Once obtained, you should use the fast data query endpoint [`/api/elexia/transformation/device/data/query/id`](https://transform.centerdenmark.com/swagger-ui/index.html#/Elexia%3A%20Device/deviceDataQuery_1) with specific `observationId`s to efficiently retrieve data.
+
+### Duplicates
+
+For all non-timeseries data, POST requests are handled as upserts, i.e. if the same object is posted twice, it results in an update, but for timeseries data there is no such functionality. Posting the same timeseries values twice will cause duplicates.
 
 ### Field Flexibility
 

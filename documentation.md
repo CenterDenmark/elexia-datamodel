@@ -493,6 +493,8 @@ Represents an organisation that owns or manages entities such as `Building` or `
 
 Stores the results of an observation.
 
+> Note that data is not cleaned for duplicates. Upon multiple deliveries of the same timeseries values duplicates will occur.
+
 - **Attributes**:
   - `procedureExecution*`: Linked observation.
   - `value*`: Measured value.
