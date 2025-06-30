@@ -453,7 +453,9 @@ This sub-step allows you to retrieve all observations for a site and query data 
 
 ---
 
-## Step 6: Adding a Weather Area to a Site
+## Step 6: Adding a Weather Area to a Site(NOT YET IMPLEMENTED IN API)
+
+> **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
 A WeatherArea is a spatial region associated with a site, similar to a building. You can add a weather area to a site using the `/api/elexia/transformation/weatherarea` endpoint. The payload is simple:
 
@@ -488,7 +490,9 @@ To connect a WeatherArea to a site, include it in the site's list of weather are
 
 > **Note:** A WeatherArea is treated as a location level, just like Building or BuildingSpace. Devices and forecasts may only be connected to a single level of location (site, building, buildingSpace, or weatherArea).
 
-### Adding Devices and Forecasts to a Weather Area
+### Adding Devices and Forecasts to a Weather Area(NOT YET IMPLEMENTED IN API)
+
+> **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
 Adding a device to a WeatherArea is done in the same way as for a building or building space, but specify the weatherArea in the device payload:
 
@@ -783,7 +787,7 @@ This allows you to post and retrieve forecasted values for properties, supportin
 
 ---
 
-## Step 8: Adding Set Points (States) to Locations and Devices
+## Step 8: Adding Set Points (States) to Locations and Devices(NOT YET IMPLEMENTED IN API)
 
 Set points (states) can be added to all location entities (Site, Building, BuildingSpace, WeatherArea) and to devices, but not to forecasts. The setup is similar to that of forecasts and devices.
 
