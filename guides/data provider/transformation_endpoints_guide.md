@@ -15,6 +15,7 @@
 7. [Step 5: Query Device Data](#step-5-query-device-data)
 8. [Step 6: Adding a Weather Area to a Site](#step-6-adding-a-weather-area-to-a-site)
 9. [Step 7: Forecasting Data](#step-7-forecasting-data)
+10. [Step 8: Adding Set Points (States) to Locations and Devices](#step-8-adding-set-points-states-to-locations-and-devices)
 
 ## General Concepts
 
@@ -27,25 +28,29 @@ After access is granted, you must generate an access token via the portal. This 
 > * **Write access** is required only for data providers.
 > * **Write access is never needed** for static entities (such as properties).
 
+### Identifier Mapping
+
+All entities in this guide are posted using `sourceId` and `organisationName`. This combination uniquely identifies records as defined by the data provider. Internally, the API maps this pair to a stable UUID (`id`) used for referencing objects. You may use either method (sourceId + organisationName or UUID) for referencing existing objects, but when creating new objects one should always use sourceId + organisationName.
+
 ### Entity Behavior
 
 > **Entity updates:** If an entity is posted again with the same `sourceId` and `organisationName`, any updated field values will overwrite the existing data. This allows updates to previously posted entities. To add relations (e.g., link a site to a new building), simply post the entity again with the additional relations included.
 
 > **Static entities:** Some entities — particularly those under `properties` such as `Property`, `UnitOfMeasure`, `AccumulationKind`, and `AggregationKind` — are managed centrally by the API provider. These values are predefined and cannot be changed by users. They must be selected from the lookup tables available via the portal.
 
-### Identifier Mapping
-
-All entities in this guide are posted using `sourceId` and `organisationName`. This combination uniquely identifies records as defined by the data provider. Internally, the API maps this pair to a stable UUID (`id`) used for referencing objects. You may use either method (sourceId + organisationName or UUID) for referencing existing objects.
-
 ### Performance
 
 Endpoints that provide context (e.g., listing all devices or observations for a site or building) are significantly slower than endpoints that return only time series data. These context endpoints should be used **infrequently** to retrieve the necessary observation or device identifiers. Once obtained, you should use the fast data query endpoint [`/api/elexia/transformation/device/data/query/id`](https://transform.centerdenmark.com/swagger-ui/index.html#/Elexia%3A%20Device/deviceDataQuery_1) with specific `observationId`s to efficiently retrieve data.
+
+### Duplicates
+
+For all non-timeseries data, POST requests are handled as upserts, i.e. if the same object is posted twice, it results in an update, but for timeseries data there is no such functionality. Posting the same timeseries values twice will cause duplicates.
 
 ### Field Flexibility
 
 In the Swagger documentation, all fields for entities are displayed. However, it is not necessary to include all fields when posting data if they are not relevant. For example, if a `Device` does not have a specific location, the `Location` object may be omitted.
 
-For fields within objects, refer to this guide to determine which fields are required.
+For fields within objects, refer to [this guide](/documentation.md) to determine which fields are required. If on intends to not deliver values for an optional fields then that fiels should be left out of the json object rather than being delivered as NULL.
 
 **Note**: In the current version, the __type__ field must always be provided. However, in future versions, this will no longer be mandatory except for `Device` entities.
 
@@ -86,6 +91,9 @@ flowchart TD
   Forecast["Forecast: forecast_indoor_temp_v3"] -.->|applies to| Sensor
   Forecast -->|forecasts| TempProp["Property: Indoor Temperature"]
   Forecast -->|forecasts| HumidityProp["Property: Humidity"]
+
+  %% State Example
+  Wall --> WallState["State: state_wall_thermal_resistance_v3"]
 ```
 
 The API uses a structured model of:
@@ -445,7 +453,9 @@ This sub-step allows you to retrieve all observations for a site and query data 
 
 ---
 
-## Step 6: Adding a Weather Area to a Site
+## Step 6: Adding a Weather Area to a Site(NOT YET IMPLEMENTED IN API)
+
+> **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
 A WeatherArea is a spatial region associated with a site, similar to a building. You can add a weather area to a site using the `/api/elexia/transformation/weatherarea` endpoint. The payload is simple:
 
@@ -480,7 +490,9 @@ To connect a WeatherArea to a site, include it in the site's list of weather are
 
 > **Note:** A WeatherArea is treated as a location level, just like Building or BuildingSpace. Devices and forecasts may only be connected to a single level of location (site, building, buildingSpace, or weatherArea).
 
-### Adding Devices and Forecasts to a Weather Area
+### Adding Devices and Forecasts to a Weather Area(NOT YET IMPLEMENTED IN API)
+
+> **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
 Adding a device to a WeatherArea is done in the same way as for a building or building space, but specify the weatherArea in the device payload:
 
@@ -717,8 +729,7 @@ The payload format for querying forecast data matches the format used for queryi
 
 ```json
 {
-  "sourceId": "forecast_indoor_temp_v3",
-  "forecastId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "data": [
     {
       "time": "2024-01-02T12:00:00Z",
@@ -773,3 +784,71 @@ The payload format for querying forecast data matches the format used for queryi
 ```
 
 This allows you to post and retrieve forecasted values for properties, supporting advanced analytics and planning.
+
+---
+
+## Step 8: Adding Set Points (States) to Locations and Devices(NOT YET IMPLEMENTED IN API)
+
+Set points (states) can be added to all location entities (Site, Building, BuildingSpace, WeatherArea) and to devices, but not to forecasts. The setup is similar to that of forecasts and devices.
+
+### Example: Posting a State for a Wall's Thermal Resistance
+
+Suppose you want to set a thermal resistance set point for a wall (building space). This example shows how to post a state and a state value, including all required references, and explicitly lists the endpoints used.
+
+#### 1. Post the State
+
+**Endpoint:** `POST /api/elexia/transformation/state`
+
+> **Note:** The `properties` field must be a single JSON object (not an array), containing the property, unit of measure, accumulation kind, and aggregation kind.
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "state": {
+    "sourceId": "state_wall_thermal_resistance_v3",
+    "type": "State",
+    "name": "Thermal Resistance Setpoint",
+    "description": "Target thermal resistance for shared wall",
+    "buildingSpace": { "sourceId": "wall_shared_v3" },
+    "properties": {
+      "propertyId": "d9a3a205-f71d-4eca-986f-dae225f40958",
+      "unitOfMeasureId": "b1d466d6-0c66-4c92-8d00-5cb36b67581d",
+      "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8",
+      "aggregationKindId": "e16765d1-e91f-4c57-9e5e-41a2ea2be0fd"
+    }
+  }
+}
+```
+
+#### 2. Post State Values
+
+**Endpoint:** `POST /api/elexia/transformation/statevalue`
+
+```json
+[
+  {
+    "sourceId": "state_wall_thermal_resistance_v3",
+    "organisationName": "dataprovider_v3",
+    "value": 2.7,
+    "timestamp": "2024-01-10T12:00:00Z"
+  }
+]
+```
+
+#### 3. Query the Latest State Value Before a Timestamp
+
+**Endpoint:** `POST /api/elexia/transformation/statevalue/last`
+
+```json
+{
+  "sourceId": "state_wall_thermal_resistance_v3",
+  "organisationName": "dataprovider_v3",
+  "timestamp": "2024-01-09T12:00:00Z"
+}
+```
+
+This will return the latest value for the state before or at the given timestamp.
+
+> **Note:** The `properties` field for State must be a single object, not an array, and must include propertyId, unitOfMeasureId, accumulationKindId, and aggregationKindId.
+
+- **Returns:** The latest value for the state before or at the given timestamp.

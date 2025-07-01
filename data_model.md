@@ -335,4 +335,37 @@ WeatherArea {
 WeatherArea }o--|| Site: hasSite
 Device }o--o| WeatherArea: contains
 ForecastModel }|--|| WeatherArea: hasForecast
+
+State {
+    uuid id PK
+    string type
+    string name
+    string description
+    string dateCreated
+    string dateModified
+}
+
+StateValue {
+    uuid stateId FK
+    float value
+    datetime timestamp
+    string dateCreated
+    string dateModified
+}
+
+%% Relationships for State
+State }|--|| Device: isStateOf
+State }|--|| Building: isStateOf
+State }|--|| BuildingSpace: isStateOf
+State }|--|| Site: isStateOf
+State }|--|| WeatherArea: isStateOf
+StateValue }|--|| State: hasState
+
+State }|--|| UnitOfMeasure: isUnitOf
+
+State }|--|| Property: isForecastedBy
+
+State }|--|| AccumulationKind: isKindOf
+
+State }|--|| AggregationKind: isKindOf
 ````

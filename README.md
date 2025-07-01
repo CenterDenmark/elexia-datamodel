@@ -18,6 +18,8 @@ For a complete visual overview of the model, please visit: [Owlgred](http://owlg
 
 We’ve added a step-by-step guide on how to post data via the API, to where navigation links are provided below.
 
+- Video with an introduction to partners in Elexia who have access to [Sharepoint](https://norce.sharepoint.com/sites/msteams_7d2c41/_layouts/15/stream.aspx?id=%2Fsites%2Fmsteams%5F7d2c41%2FShared%20Documents%2FWP3%20%2D%20Integration%20and%20demonstration%20at%20the%20pilot%20s%2FDSP%20integration%2FDSP%20transfer%20guide%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2Ebbce6694%2D0512%2D4293%2Da1ea%2Ddb12354ea9e7).
+
 - General documentation on the data model: https://github.com/CenterDenmark/elexia-datamodel/blob/main/documentation.md
 
 - Relevant links for swagger documentation: https://github.com/CenterDenmark/elexia-datamodel/blob/main/documentation.md#api-reference

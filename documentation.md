@@ -5,9 +5,11 @@
 - [Data Model Documentation](#data-model-documentation)
   - [Table of Contents](#table-of-contents)
   - [How to Read the Data Model](#how-to-read-the-data-model)
-  - [Clarifications for Properties and Units of Measure](#clarifications-for-properties-and-units-of-measure)
+  - [Clarifications for Static Entities](#clarifications-for-static-entities)
     - [Property](#property)
     - [UnitOfMeasure](#unitofmeasure)
+    - [AccumulationKind](#accumulationkind)
+    - [AggregationKind](#aggregationkind)
   - [Entities](#entities)
     - [Building](#building)
     - [BuildingSpace](#buildingspace)
@@ -23,6 +25,8 @@
     - [PropertyValue](#propertyvalue)
     - [Relations](#relations)
     - [WeatherArea](#weatherarea)
+    - [State](#state)
+    - [StateValue](#statevalue)
   - [API Reference](#api-reference)
 
 This documentation describes the physical datasets of the data model, including the purpose and structure of each entity, relationships, and specific guidelines for defining properties and units of measure. This is intended for sharing on GitHub and provides complete details for all entities.
@@ -63,7 +67,9 @@ This documentation describes the physical datasets of the data model, including 
 
 ---
 
-## Clarifications for Properties and Units of Measure
+## Clarifications for Static Entities
+
+Static entities contain definitions that apply globally in the data model and cannot be changed by any other stakeholder than the platform owner. These include Property, UnitOfMeasure, AccumulationKind, and AggregationKind. All references to these entities must use the values provided by the platform.
 
 ### Property
 
@@ -114,6 +120,38 @@ Represents the unit used to measure a `Property`.
   "description": "Degrees Celsius",
   "dateCreated": "2024-01-01T00:00:00Z",
   "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+### AccumulationKind
+
+Defines the kind of accumulation for a property or state (e.g., none, sum, average, delta). Defined based on [CIM AccumulationKind](https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/).
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Name of the accumulation kind (e.g., "None", "Sum", "Average", "Delta").
+
+- **Example**:
+```json
+{
+  "id": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8",
+  "name": "None"
+}
+```
+
+### AggregationKind
+
+Defines the kind of aggregation for a property or state (e.g., none, average, min, max). Defined based on [CIM AggregationKind](https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind).
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Name of the aggregation kind (e.g., "None", "Average", "Min", "Max").
+
+- **Example**:
+```json
+{
+  "id": "e16765d1-e91f-4c57-9e5e-41a2ea2be0fd",
+  "name": "None"
 }
 ```
 
@@ -455,6 +493,8 @@ Represents an organisation that owns or manages entities such as `Building` or `
 
 Stores the results of an observation.
 
+> Note that data is not cleaned for duplicates. Upon multiple deliveries of the same timeseries values duplicates will occur.
+
 - **Attributes**:
   - `procedureExecution*`: Linked observation.
   - `value*`: Measured value.
@@ -518,6 +558,61 @@ Represents a weather area, which is a spatial region associated with a site. Wea
   "dateModified": "2024-01-01T00:00:00Z"
 }
 ```
+
+---
+
+### State
+
+Represents a set point or control state that can be associated with a device or any location entity (Building, BuildingSpace, Site, WeatherArea). Not used for forecasts.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `type*`: Always "State".
+  - `name`: State name.
+  - `description`: Metadata.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Relations**:
+  - Linked to exactly one of: Device, Building, BuildingSpace, Site, or WeatherArea.
+  - Linked to one Property (what the state controls), one UnitOfMeasure, one AccumulationKind, and one AggregationKind via relations.
+
+- **Example**:
+```json
+{
+  "id": "State001",
+  "type": "State",
+  "name": "Thermal Resistance Setpoint",
+  "description": "Target thermal resistance for shared wall",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+### StateValue
+
+Stores the set point or control value for a state. At any given time, the value of a state is defined by the latest value in StateValue before the specified timestamp.
+
+- **Attributes**:
+  - `stateId*`: Linked state.
+  - `value*`: Set point value.
+  - `timestamp*`: Time of the set point.
+  - `source`: Data source.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Example**:
+```json
+{
+  "stateId": "State001",
+  "value": 21.0,
+  "timestamp": "2024-01-02T12:00:00Z",
+  "dateCreated": "2024-01-02T12:00:00Z",
+  "dateModified": "2024-01-02T12:00:00Z"
+}
+```
+
+> **Note:** There is an endpoint for obtaining the last value of a state before a specific timestamp.
 
 ---
 
