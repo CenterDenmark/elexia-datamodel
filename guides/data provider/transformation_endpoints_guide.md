@@ -30,7 +30,7 @@ After access is granted, you must generate an access token via the portal. This 
 
 ### Identifier Mapping
 
-All entities in this guide are posted using `sourceId` and `organisationName`. This combination uniquely identifies records as defined by the data provider. Internally, the API maps this pair to a stable UUID (`id`) used for referencing objects. You may use either method (sourceId + organisationName or UUID) for referencing existing objects, but when creating new objects one should always use sourceId + organisationName.
+All entities in this guide are posted using `sourceId` and `organisationName`. This combination uniquely identifies records as defined by the data provider. Internally, the API maps this pair to a stable UUID (`id`) used for referencing objects. You may use either method (sourceId + organisationName or UUID) for referencing existing objects, but when creating new objects one should always use sourceId + organisationName. It is generally recommended to use the id for existing objects that your organisation have not created, i.e. replace the combination sourceId + organisationName with id in the examples below whenever existing objects are referenced.
 
 ### Entity Behavior
 
