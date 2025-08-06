@@ -598,8 +598,6 @@ Stores the set point or control value for a state. At any given time, the value 
   - `value*`: Set point value.
   - `timestamp*`: Time of the set point.
   - `source`: Data source.
-  - `dateCreated`: Creation timestamp.
-  - `dateModified`: Last modification timestamp.
 
 - **Example**:
 ```json
@@ -607,8 +605,6 @@ Stores the set point or control value for a state. At any given time, the value 
   "stateId": "State001",
   "value": 21.0,
   "timestamp": "2024-01-02T12:00:00Z",
-  "dateCreated": "2024-01-02T12:00:00Z",
-  "dateModified": "2024-01-02T12:00:00Z"
 }
 ```
 

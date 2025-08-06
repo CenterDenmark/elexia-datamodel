@@ -13,9 +13,9 @@
 5. [Step 3: Add Devices](#step-3-add-devices)
 6. [Step 4: Add Device Data](#step-4-add-device-data)
 7. [Step 5: Query Device Data](#step-5-query-device-data)
-8. [Step 6: Adding a Weather Area to a Site](#step-6-adding-a-weather-area-to-a-site)
+8. [Step 6: Adding a Weather Area to a Site (NOT YET IMPLEMENTED IN API)](#step-6-adding-a-weather-area-to-a-site-not-yet-implemented-in-api)
 9. [Step 7: Forecasting Data](#step-7-forecasting-data)
-10. [Step 8: Adding Set Points (States) to Locations and Devices](#step-8-adding-set-points-states-to-locations-and-devices)
+10. [Step 8: Adding Set Points (States) to Locations and Devices (NOT YET IMPLEMENTED IN API)](#step-8-adding-set-points-states-to-locations-and-devices-not-yet-implemented-in-api)
 
 ## General Concepts
 
@@ -453,7 +453,7 @@ This sub-step allows you to retrieve all observations for a site and query data 
 
 ---
 
-## Step 6: Adding a Weather Area to a Site(NOT YET IMPLEMENTED IN API)
+## Step 6: Adding a Weather Area to a Site NOT YET IMPLEMENTED IN API
 
 > **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
@@ -490,7 +490,7 @@ To connect a WeatherArea to a site, include it in the site's list of weather are
 
 > **Note:** A WeatherArea is treated as a location level, just like Building or BuildingSpace. Devices and forecasts may only be connected to a single level of location (site, building, buildingSpace, or weatherArea).
 
-### Adding Devices and Forecasts to a Weather Area(NOT YET IMPLEMENTED IN API)
+### Adding Devices and Forecasts to a Weather Area - NOT YET IMPLEMENTED IN API
 
 > **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
@@ -787,7 +787,7 @@ This allows you to post and retrieve forecasted values for properties, supportin
 
 ---
 
-## Step 8: Adding Set Points (States) to Locations and Devices(NOT YET IMPLEMENTED IN API)
+## Step 8: Adding Set Points (States) to Locations and Devices (NOT YET IMPLEMENTED IN API)
 
 Set points (states) can be added to all location entities (Site, Building, BuildingSpace, WeatherArea) and to devices, but not to forecasts. The setup is similar to that of forecasts and devices.
 
