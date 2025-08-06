@@ -201,8 +201,6 @@ PropertyValue {
     %% datetime: is always either the specific time of the observation or the end time where the value is for instance averaged since the last time. It should be a xsd datetime
     datetime timestamp
     string source
-    string dateCreated
-    string dateModified
 }
 
 PropertyValueInterval {
@@ -214,8 +212,6 @@ PropertyValueInterval {
     %% endTime: the beginning of the interval. It should be an xsd datetime
     datetime endTime
     string source
-    string dateCreated
-    string dateModified
 }
 
 AccumulationKind {
@@ -332,7 +328,7 @@ WeatherArea {
     string dateModified
 }
 
-WeatherArea }o--|| Site: hasSite
+WeatherArea }o--|{ Site: hasSite
 Device }o--o| WeatherArea: contains
 ForecastModel }|--|| WeatherArea: hasForecast
 
@@ -349,8 +345,6 @@ StateValue {
     uuid stateId FK
     float value
     datetime timestamp
-    string dateCreated
-    string dateModified
 }
 
 %% Relationships for State
