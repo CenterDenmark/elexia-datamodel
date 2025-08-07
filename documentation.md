@@ -2,22 +2,32 @@
 
 ## Table of Contents
 
-1. [How to Read the Data Model](#how-to-read-the-data-model)
-2. [Clarifications for Properties and Units of Measure](#clarifications-for-properties-and-units-of-measure)
-   - [Property](#property)
-   - [UnitOfMeasure](#unitofmeasure)
-3. [Entities](#entities)
-   - [Building](#building)
-   - [BuildingSpace](#buildingspace)
-   - [Device](#device)
-   - [Observation](#observation)
-   - [Address](#address)
-   - [Site](#site)
-   - [Location](#location)
-   - [Organisation](#organisation)
-   - [PropertyValue](#propertyvalue)
-4. [Relations](#relations)
-5. [API Reference](#api-reference)
+- [Data Model Documentation](#data-model-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [How to Read the Data Model](#how-to-read-the-data-model)
+  - [Clarifications for Static Entities](#clarifications-for-static-entities)
+    - [Property](#property)
+    - [UnitOfMeasure](#unitofmeasure)
+    - [AccumulationKind](#accumulationkind)
+    - [AggregationKind](#aggregationkind)
+  - [Entities](#entities)
+    - [Building](#building)
+    - [BuildingSpace](#buildingspace)
+    - [Device](#device)
+    - [Observation](#observation)
+    - [ForecastModel](#forecastmodel)
+    - [ForecastObservation](#forecastobservation)
+    - [ForecastData](#forecastdata)
+    - [Address](#address)
+    - [Site](#site)
+    - [Location](#location)
+    - [Organisation](#organisation)
+    - [PropertyValue](#propertyvalue)
+    - [Relations](#relations)
+    - [WeatherArea](#weatherarea)
+    - [State](#state)
+    - [StateValue](#statevalue)
+  - [API Reference](#api-reference)
 
 This documentation describes the physical datasets of the data model, including the purpose and structure of each entity, relationships, and specific guidelines for defining properties and units of measure. This is intended for sharing on GitHub and provides complete details for all entities.
 
@@ -57,7 +67,9 @@ This documentation describes the physical datasets of the data model, including 
 
 ---
 
-## Clarifications for Properties and Units of Measure
+## Clarifications for Static Entities
+
+Static entities contain definitions that apply globally in the data model and cannot be changed by any other stakeholder than the platform owner. These include Property, UnitOfMeasure, AccumulationKind, and AggregationKind. All references to these entities must use the values provided by the platform.
 
 ### Property
 
@@ -75,7 +87,7 @@ A `Property` represents a measurable or observable attribute, such as temperatur
   - `dateModified`: Last modification timestamp.
 
 - **Example**:
-```
+```json
 {
   "id": "Property001",
   "type": "Property",
@@ -111,6 +123,38 @@ Represents the unit used to measure a `Property`.
 }
 ```
 
+### AccumulationKind
+
+Defines the kind of accumulation for a property or state (e.g., none, sum, average, delta). Defined based on [CIM AccumulationKind](https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/).
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Name of the accumulation kind (e.g., "None", "Sum", "Average", "Delta").
+
+- **Example**:
+```json
+{
+  "id": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8",
+  "name": "None"
+}
+```
+
+### AggregationKind
+
+Defines the kind of aggregation for a property or state (e.g., none, average, min, max). Defined based on [CIM AggregationKind](https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind).
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Name of the aggregation kind (e.g., "None", "Average", "Min", "Max").
+
+- **Example**:
+```json
+{
+  "id": "e16765d1-e91f-4c57-9e5e-41a2ea2be0fd",
+  "name": "None"
+}
+```
+
 ---
 
 ## Entities
@@ -120,8 +164,8 @@ Represents the unit used to measure a `Property`.
 Represents a physical structure.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Building".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Building".
   - `name`: Building name.
   - `description`: Metadata.
   - `livingArea`: Area in square meters.
@@ -154,13 +198,13 @@ Represents a physical structure.
 Defines spatial elements of a building and supports hierarchical relationships.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "BuildingSpace".
+  - `id*`: Unique identifier.
+  - `type*`: Always "BuildingSpace".
   - `name`: Space name.
   - `alternateName`: Alternative name.
   - `area`: Area in square meters.
   - `airVolume`: Volume in cubic meters.
-  - `buildingSpaceKind`: Type of space.
+  - `buildingSpaceKind*`: Type of space. This can be any of those in the reference.
   - `source`: Data source.
   - `dateCreated`: Creation timestamp.
   - `dateModified`: Last modification timestamp.
@@ -177,7 +221,7 @@ Defines spatial elements of a building and supports hierarchical relationships.
   "name": "Conference Room",
   "area": 50.0,
   "airVolume": 150.0,
-  "buildingSpaceKind": "Room",
+  "buildingSpaceKind": "Space",
   "dateCreated": "2024-01-01T00:00:00Z",
   "dateModified": "2024-01-01T00:00:00Z"
 }
@@ -190,8 +234,8 @@ Defines spatial elements of a building and supports hierarchical relationships.
 Represents a physical device.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Device type (e.g., "Meter").
+  - `id*`: Unique identifier.
+  - `type*`: Device type (e.g., "Meter").
   - `name`: Device name.
   - `description`: Metadata.
   - `dateInstalled`: Installation date.
@@ -223,8 +267,8 @@ Represents a physical device.
 Represents a measurable event where a `Device` measures a specific `Property`.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Observation".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Observation".
   - `description`: Metadata.
   - `temporalType`: Interval or Instant.
   - `dateCreated`: Creation timestamp.
@@ -244,6 +288,94 @@ Represents a measurable event where a `Device` measures a specific `Property`.
 
 ---
 
+### ForecastModel
+
+Represents a forecasting model that produces forecasted values for properties at sites, buildings, building spaces or devices.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Model name.
+  - `modelType`: Type of model (e.g., "ARIMA", "ML").
+  - `modelVersion`: Version string.
+  - `period`: ISO 8601 period string indicating the period that each forecast will cover (e.g., "PT3H" for a 3-hour forecast horizon).
+  - `frequency`: ISO 8601 period string specifying how often forecasts are delivered. If left empty, the frequency is assumed to be varying.
+  - `interval`: ISO 8601 period string specifying the time interval between forecast values. If left empty, the interval is assumed to be varying.
+  - `description`: Free text field describing the forecast model.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Example**:
+```json
+{
+  "id": "forecast_weather_v3",
+  "organisationName": "dataprovider_v3",
+  "name": "Weather Forecast Model v3",
+  "modelType": "ML",
+  "modelVersion": "1.0.0",
+  "period": "PT3H",
+  "frequency": "PT1H",
+  "interval": "PT1H",
+  "description": "Forecasts temperature and humidity every hour for the next 3 hours.",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+--- 
+
+### ForecastObservation
+
+Represents a forecasted observation for a property, produced by a forecast model.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `type*`: Always "ForecastObservation".
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+  - `propertyId`, `unitOfMeasureId`, `accumulationKindId`, `aggregationKindId`: As defined in the ForecastModel's properties array.
+
+- **Note**: Normally, forecast observations are created automatically when posting a ForecastModel with a `properties` array.
+
+- **Example**:
+```json
+{
+  "id": "ForecastObs001",
+  "type": "ForecastObservation",
+  "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+  "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+  "accumulationKindId": "15e95acc-48b7-4756-a264-c0cac5461125",
+  "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+---
+
+### ForecastData
+
+Stores the forecasted values for a forecast observation.
+
+- **Attributes**:
+  - `procedureExecution*`: Linked forecast observation.
+  - `value*`: Forecasted value.
+  - `timestamp*`: Forecasted time.
+  - `version*`: Integer version. For each (`procedureExecution`, `timestamp`) pair, a new forecast value must have a strictly higher version than any previous value for that timestamp.
+
+- **Example**:
+```json
+{
+  "procedureExecution": "ForecastObs001",
+  "value": 18.5,
+  "timestamp": "2024-01-02T12:00:00Z",
+  "version": 1
+}
+```
+
+> **Note:** If a new forecast value is delivered for a specific `procedureExecution` and `timestamp`, the `version` must be incremented (it must be strictly higher than the previous value for that timestamp).
+
+---
+
 ### Address
 
 Defines a postal address associated with entities like `Building` or `Organisation`.
@@ -253,9 +385,9 @@ Defines a postal address associated with entities like `Building` or `Organisati
   - The entity is defined based on [https://schema.org/address](https://schema.org/address).
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "PostalAddress".
-  - `streetAddress`: Street name.
+  - `id*`: Unique identifier.
+  - `type*`: Always "PostalAddress".
+  - `streetAddress*`: Street name.
   - `streetNr`: Street number.
   - `addressLocality`: Locality.
   - `postalCode`: Postal code.
@@ -283,11 +415,11 @@ Defines a postal address associated with entities like `Building` or `Organisati
 
 ### Site
 
-Represents a geographic or administrative area associated with buildings or organisations.
+Represents a geographic or administrative area associated with buildings or organisations. In the Elexia project, this would be a Pilot Site.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Site".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Site".
   - `name`: Site name.
   - `description`: Metadata.
   - `dateCreated`: Creation timestamp.
@@ -312,8 +444,8 @@ Represents a geographic or administrative area associated with buildings or orga
 Defines a spatial location associated with other entities.
  
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Location".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Location".
   - `value`: A GeoJSON string representing the location.
   - `dateCreated`: Creation timestamp.
   - `dateModified`: Last modification timestamp.
@@ -336,8 +468,8 @@ Defines a spatial location associated with other entities.
 Represents an organisation that owns or manages entities such as `Building` or `Site`.
 
 - **Attributes**:
-  - `id`: Unique identifier.
-  - `type`: Always "Organisation".
+  - `id*`: Unique identifier.
+  - `type*`: Always "Organisation".
   - `name`: Organisation name.
   - `description`: Metadata.
   - `dateCreated`: Creation timestamp.
@@ -361,21 +493,19 @@ Represents an organisation that owns or manages entities such as `Building` or `
 
 Stores the results of an observation.
 
+> Note that data is not cleaned for duplicates. Upon multiple deliveries of the same timeseries values duplicates will occur.
+
 - **Attributes**:
-  - `procedureExecution`: Linked observation.
-  - `value`: Measured value.
-  - `timestamp`: Measurement time.
-  - `dateCreated`: Creation timestamp.
-  - `dateModified`: Last modification timestamp.
+  - `procedureExecution*`: Linked observation.
+  - `value*`: Measured value.
+  - `timestamp*`: Measurement time.
 
 - **Example**:
 ```json
 {
   "procedureExecution": "Obs001",
   "value": 22.5,
-  "timestamp": "2024-01-01T12:00:00Z",
-  "dateCreated": "2024-01-01T00:00:00Z",
-  "dateModified": "2024-01-01T00:00:00Z"
+  "timestamp": "2024-01-01T12:00:00Z"
 }
 ```
 
@@ -391,7 +521,7 @@ Defines relationships between entities.
   - `entityTo`: Target entity.
   - `entity_classTo`: Target class.
   - `type`: Relationship type.
-
+  - `isActive`: Integer (1 = active, 0 = not active) indicating if the relationship is currently active.
 
 **Example**:
 ```json
@@ -400,36 +530,105 @@ Defines relationships between entities.
   "entity_classFrom": "Device",
   "entityTo": "Obs001",
   "entity_classTo": "Observation",
-  "type": "madeExecution"
+  "type": "madeExecution",
+  "isActive": 1
 }
 ```
 
 ---
 
+### WeatherArea
+
+Represents a weather area, which is a spatial region associated with a site. Weather areas can have devices and forecasts connected to them, similar to buildings.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `name`: Weather area name.
+  - `description`: Metadata.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Example**:
+```json
+{
+  "id": "WeatherArea001",
+  "name": "Rooftop Weather Area",
+  "description": "Weather station area on the rooftop",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+---
+
+### State
+
+Represents a set point or control state that can be associated with a device or any location entity (Building, BuildingSpace, Site, WeatherArea). Not used for forecasts.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `type*`: Always "State".
+  - `name`: State name.
+  - `description`: Metadata.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Relations**:
+  - Linked to exactly one of: Device, Building, BuildingSpace, Site, or WeatherArea.
+  - Linked to one Property (what the state controls), one UnitOfMeasure, one AccumulationKind, and one AggregationKind via relations.
+
+- **Example**:
+```json
+{
+  "id": "State001",
+  "type": "State",
+  "name": "Thermal Resistance Setpoint",
+  "description": "Target thermal resistance for shared wall",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+### StateValue
+
+Stores the set point or control value for a state. At any given time, the value of a state is defined by the latest value in StateValue before the specified timestamp.
+
+- **Attributes**:
+  - `stateId*`: Linked state.
+  - `value*`: Set point value.
+  - `timestamp*`: Time of the set point.
+  - `source`: Data source.
+
+- **Example**:
+```json
+{
+  "stateId": "State001",
+  "value": 21.0,
+  "timestamp": "2024-01-02T12:00:00Z",
+}
+```
+
+> **Note:** There is an endpoint for obtaining the last value of a state before a specific timestamp.
+
+---
+
 ## API Reference
 
-For interacting with the data model, the following API endpoints are used:
+For interacting with the data model, it is reccomended to use the tranformation endpoints, but each entity also has its own base endpoint for direct interaction. Use this diagram as reference:
 
-1. **Relational Data**:\
-   POST data to:
+![d1](/res/API_interaction_diagram.drawio.png)
 
-   ```
-   /api/v1/dataset/relational/{datasetId}
-   ```
+- For guide on how to add data, please refer to [this guide](/guides/data%20provider/transformation_endpoints_guide.md) 
+- For more info on how base endpoints work, refer to [this guide](/guides/base_endpoints_guide.md)
 
-2. **Timeseries Data** (`PropertyValue` and `PropertyValueInterval`):\
-   POST data to:
-
-   ```
-   /api/v1/dataset/timeseries/{datasetId}
-   ```
-
-### Updating existing rows
-
-New updates for an entity are appended as a new row with the same id, but a different dateModified.
-
-**Swagger Documentation**: [API Documentation](https://api.centerdenmark.com/swagger-ui/index.html#/)
+**Swagger Documentation**: 
+  
+  - [Base Endpoints](https://api.centerdenmark.com/swagger-ui/index.html#/)
+  - [Transformation Endpoints for Prod environment](https://transform.centerdenmark.com/swagger-ui/index.html#/)
+  - [Transformation Endpoints for Test environment](https://test-transform.centerdenmark.com/swagger-ui/index.html#/)
 
 **Portal**: [User interface for API](https://portal.centerdenmark.com/)
+
+An API for mapping between existing ids and data lake ids is being developed [here](https://transform.centerdenmark.com/swagger-ui/index.html). This api also allows posting complex json objects such that the user does not need to post individual entities to each table. 
 
 ---

@@ -32,8 +32,6 @@ ForecastModel }|--|| BuildingSpace: hasForecast
 
 ForecastModel }|--|| Site: hasForecast
 
-ForecastModel }o--o| WeatherArea: hasForecast
-
 ForecastObservation }|--|| UnitOfMeasure: isUnitOf
 
 ForecastObservation }|--|| Property: isForecastedBy
@@ -68,6 +66,10 @@ Address }|--o| Site: hasAddress
 %% isLocationOf is the inverse of hasLocation
 Building }o--|| Location: isLocationOf
 
+WeatherArea }o--|| Location: isLocationOf
+
+WeatherArea }o--|| Location: isLocationOf
+
 Device }o--o| Location: isLocationOf
 
 BuildingSpace }o--|| Location: isLocationOf
@@ -91,9 +93,11 @@ Relations {
     str type
     str entity_classFrom
     str entity_classTo
+    %% 1 = active, 0 = not active
+    int isActive 
     %% Examples:
-    %% <uuid1>, <uuid2>, contains, Building, BuildingSpace
-    %% <uuid1>, <uuid2>, owns, Organisation, Building
+    %% <uuid1>, <uuid2>, contains, Building, BuildingSpace, 1
+    %% <uuid1>, <uuid2>, owns, Organisation, Building, 1
 }
 
 Building {
@@ -205,22 +209,30 @@ PropertyValue {
     %% datetime: is always either the specific time of the observation or the end time where the value is for instance averaged since the last time. It should be a xsd datetime
     datetime timestamp
     string source
-    datetime dateCreated
-    datetime dateModified
 }
 
-%%PropertyValueInterval {
-%%    %% Foreign key can map to any subclass of ProcedureExecution
-%%    uuid procedureExecution FK
-%%    float value
-%%    %% startTime: the beginning of the interval. It should be an xsd datetime
-%%    datetime startTime
-%%    %% endTime: the beginning of the interval. It should be an xsd datetime
-%%    datetime endTime
-%%    string source
-%%    datetime dateCreated
-%%    datetime dateModified
-%%}
+PropertyValueInterval {
+    %% Foreign key can map to any subclass of ProcedureExecution
+    uuid procedureExecution FK
+    float value
+    %% startTime: the beginning of the interval. It should be an xsd datetime
+    datetime startTime
+    %% endTime: the beginning of the interval. It should be an xsd datetime
+    datetime endTime
+    string source
+}
+
+AccumulationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/
+    uuid id PK
+    str name
+}
+
+AggregationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind
+    uuid id PK
+    str name
+}
 
 Property {
     %% Defined by https://www.qudt.org/doc/DOC_VOCAB-QUANTITY-KINDS.html#Instances
@@ -358,6 +370,14 @@ ForecastModel {
     string modelVersion
     %% ISO 8601 compliant
     string period
+    %% ISO 8601 compliant, how often forecasts are delivered. If empty, frequency is varying.
+    string frequency
+    %% ISO 8601 compliant, time interval between forecast values. If empty, interval is varying.
+    string interval
+    %% Free text field describing the forecast model
+    string description
+    string dateCreated
+    string dateModified
 }
 
 ForecastObservation {
@@ -372,9 +392,50 @@ ForecastData {
     uuid procedureExecution FK
     float value
     datetime timestamp
-    %% What is the most optimal format for implementation
-    string version
+    %% version: Must be an integer. For each (procedureExecution, timestamp) pair, a new forecast value must have a strictly higher version than any previous value for that timestamp.
+    int version
 }
 
+WeatherArea {
+    uuid id PK
+    string name
+    string description
+    string dateCreated
+    string dateModified
+}
 
+WeatherArea }o--|{ Site: hasSite
+Device }o--o| WeatherArea: contains
+ForecastModel }|--|| WeatherArea: hasForecast
+
+State {
+    uuid id PK
+    string type
+    string name
+    string description
+    string dateCreated
+    string dateModified
+}
+
+StateValue {
+    uuid stateId FK
+    float value
+    datetime timestamp
+}
+
+%% Relationships for State
+State }|--|| Device: isStateOf
+State }|--|| Building: isStateOf
+State }|--|| BuildingSpace: isStateOf
+State }|--|| Site: isStateOf
+State }|--|| WeatherArea: isStateOf
+StateValue }|--|| State: hasState
+
+State }|--|| UnitOfMeasure: isUnitOf
+
+State }|--|| Property: isForecastedBy
+
+State }|--|| AccumulationKind: isKindOf
+
+State }|--|| AggregationKind: isKindOf
 ````
