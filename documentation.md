@@ -262,6 +262,52 @@ Represents a physical device.
 
 ---
 
+### Photovoltaic
+
+Represents a photovoltaic (solar panel) device. This is a subclass of `Device` and inherits all the relations and attributes that a device has.
+
+- **Attributes**:
+  - `id*`: Unique identifier.
+  - `installedPeakPower`: Installed peak power (DC capacity) in kW DC.
+  - `inverterCapacity`: Inverter capacity in kW AC.
+  - `inverterVoltageRating`: Inverter voltage rating in V AC.
+  - `systemLoss`: System loss as a percentage.
+  - `installationPosition`: String description of installation position.
+  - `installedArea`: Installed area in square meters.
+  - `installationDate`: Installation date in MMYYYY format.
+  - `installationCost`: Installation cost in EUR.
+  - `expectedLifetime`: Expected lifetime in years.
+  - `mountType`: Mount type (e.g., roof, fixed, tracking).
+  - `slope`: Slope in degrees.
+  - `azimuth`: Azimuth in degrees.
+  - `dateCreated`: Creation timestamp.
+  - `dateModified`: Last modification timestamp.
+
+- **Note**: As a subclass of `Device`, Photovoltaic entities inherit all device relationships and can be linked to observations, buildings, building spaces, weather areas, and other entities through the Relations table.
+
+- **Example**:
+```json
+{
+  "id": "PV001",
+  "installedPeakPower": 5.2,
+  "inverterCapacity": 5.0,
+  "inverterVoltageRating": 230.0,
+  "systemLoss": 15.5,
+  "installationPosition": "South-facing rooftop",
+  "installedArea": 30.5,
+  "installationDate": "032024",
+  "installationCost": 8500.0,
+  "expectedLifetime": 25,
+  "mountType": "roof",
+  "slope": 35.0,
+  "azimuth": 180.0,
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-01-01T00:00:00Z"
+}
+```
+
+---
+
 ### Observation
 
 Represents a measurable event where a `Device` measures a specific `Property`.

@@ -295,19 +295,32 @@ Sensor {
 Photovoltaic {
     %% Subclass of device and has all the relations a device has
     uuid id PK
-    str name
-    %% In kW
-    float maxP
-    float minP
-    %% A percentage
-    float efficiency
-    %% Are ranges static?
-    float inclinationRange
-    float orientationRange
-    %% Not exactly sure how to represent the following two. Should be observations/actuations on the PV
-    float availabilityMeasurement
-    float curtailmentMeasurement
-    datetime dateInstalled
+    %% installed peak power (DC capacity) (kW DC)
+    float installedPeakPower
+    %% inverter capacity (kW AC)
+    float inverterCapacity
+    %% inverter voltage rating (V AC)
+    float inverterVoltageRating
+    %% system loss (%)
+    float systemLoss
+    %% installation position (string description)
+    string installationPosition
+    %% installed area (m2)
+    float installedArea
+    %% installation date (MMYYYY)
+    string installationDate
+    %% installation cost (EUR)
+    float installationCost
+    %% expected lifetime (YY)
+    int expectedLifetime
+    %% mount type (string: e.g. roof, fixed, tracking)
+    string mountType
+    %% slope (degrees)
+    float slope
+    %% azimuth (degrees)
+    float azimuth
+    datetime dateCreated
+    datetime dateModified
 }
 
 ElectricVehicle {
