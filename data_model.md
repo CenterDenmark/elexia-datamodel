@@ -308,7 +308,7 @@ Photovoltaic {
     %% installed area (m2)
     float installedArea
     %% installation date (MMYYYY)
-    string installationDate
+    string dateInstalled
     %% installation cost (EUR)
     float installationCost
     %% expected lifetime (YY)
@@ -323,16 +323,13 @@ Photovoltaic {
     datetime dateModified
 }
 
-ElectricVehicle {
+EV {
     uuid id PK
+    %% powerCharge: Charging power of EV charger i kW.
+    float powerCharge
+    datetime dateInstalled
 }
 
-%%HVAC {
-%%    %% Subclass of device and has all the relations a device has
-%%    uuid id PK
-%%    str name
-%%    datetime dateInstalled
-%%}
 
 WeatherArea {
     uuid id PK
@@ -342,7 +339,7 @@ WeatherArea {
 }
 
 DeviceSubclasses {
-    entity ElectricVehicle
+    entity EV
     entity Meter
     entity Sensor
     entity WeatherStation

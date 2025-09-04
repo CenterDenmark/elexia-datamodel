@@ -262,6 +262,26 @@ Represents a physical device.
 
 ---
 
+### EV
+
+Represents an EV charger. This is a subclass of `Device` and inherits all the relations and attributes that a device has
+
+- **Attributes**:
+  - `id`: Unique identifier
+  - `powerCharge`: Charging power of EV charger i kW.
+  - `dateInstalled`: Installation date.
+
+- **Example**:
+```json
+{
+  "id": "someUUID",
+  "powerCharge": 30,
+  "dateInstalled": "2024-01-01T00:00:00Z"
+}
+```
+
+---
+
 ### Photovoltaic
 
 Represents a photovoltaic (solar panel) device. This is a subclass of `Device` and inherits all the relations and attributes that a device has.
@@ -274,7 +294,7 @@ Represents a photovoltaic (solar panel) device. This is a subclass of `Device` a
   - `systemLoss`: System loss as a percentage.
   - `installationPosition`: String description of installation position.
   - `installedArea`: Installed area in square meters.
-  - `installationDate`: Installation date in MMYYYY format.
+  - `dateInstalled`: Installation date in MMYYYY format.
   - `installationCost`: Installation cost in EUR.
   - `expectedLifetime`: Expected lifetime in years.
   - `mountType`: Mount type (e.g., roof, fixed, tracking).
@@ -295,7 +315,7 @@ Represents a photovoltaic (solar panel) device. This is a subclass of `Device` a
   "systemLoss": 15.5,
   "installationPosition": "South-facing rooftop",
   "installedArea": 30.5,
-  "installationDate": "032024",
+  "dateInstalled": "032024",
   "installationCost": 8500.0,
   "expectedLifetime": 25,
   "mountType": "roof",
@@ -616,6 +636,7 @@ Represents a set point or control state that can be associated with a device or 
   - `type*`: Always "State".
   - `name`: State name.
   - `description`: Metadata.
+  - `string_state`: Indicates if state has string or numerixc values
   - `dateCreated`: Creation timestamp.
   - `dateModified`: Last modification timestamp.
 
@@ -630,6 +651,7 @@ Represents a set point or control state that can be associated with a device or 
   "type": "State",
   "name": "Thermal Resistance Setpoint",
   "description": "Target thermal resistance for shared wall",
+  "string_atate": 0,
   "dateCreated": "2024-01-01T00:00:00Z",
   "dateModified": "2024-01-01T00:00:00Z"
 }
