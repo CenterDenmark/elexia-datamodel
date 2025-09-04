@@ -400,8 +400,8 @@ To retrieve time series data (measurements, observations, forecasts, states), us
   **Recommendation:** Use the `/query/id` endpoints for best performance, especially when you already know the relevant IDs.
 
 **Example: Query device data by observation IDs**
-```json
 POST /api/elexia/transformation/device/data/query/id
+```json
 {
   "observationIds": ["obs-uuid-202", "obs-uuid-303"],
   "startTime": "2024-01-01T00:00:00Z",
@@ -410,8 +410,8 @@ POST /api/elexia/transformation/device/data/query/id
 ```
 
 **Example: Query forecast data by forecast observation IDs**
-```json
 POST /api/elexia/transformation/forecast/data/query/id
+```json
 {
   "observationIds": ["forecast-obs-uuid-606"],
   "startTime": "2024-01-02T00:00:00Z",
@@ -420,8 +420,8 @@ POST /api/elexia/transformation/forecast/data/query/id
 ```
 
 **Example: Query state data by state IDs**
-```json
 POST /api/elexia/transformation/state/data/query/id
+```json
 {
   "stateIds": ["state-uuid-101", "state-uuid-102"],
   "startTime": "2024-01-01T00:00:00Z",
