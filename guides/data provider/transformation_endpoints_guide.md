@@ -8,14 +8,14 @@
    - [Performance](#performance)
    - [Field Flexibility](#field-flexibility)
 2. [Example Scenario](#example-scenario)
-3. [Step 1: Add Location Information (Buildings and Spaces)](#step-1-add-location-information-buildings-and-spaces)
-4. [Step 2: Add Location Information (Sites)](#step-2-add-location-information-sites)
+3. [Step 1: Add Location Information (Sites)](#step-1-add-location-information-sites)
+4. [Step 2: Add Location Information (Buildings and Spaces)](#step-2-add-location-information-buildings-and-spaces)
 5. [Step 3: Add Devices](#step-3-add-devices)
 6. [Step 4: Add Device Data](#step-4-add-device-data)
 7. [Step 5: Query Device Data](#step-5-query-device-data)
-8. [Step 6: Adding a Weather Area to a Site (NOT YET IMPLEMENTED IN API)](#step-6-adding-a-weather-area-to-a-site-not-yet-implemented-in-api)
+8. [Step 6: Adding a Weather Area to a Site](#step-6-adding-a-weather-area-to-a-site)
 9. [Step 7: Forecasting Data](#step-7-forecasting-data)
-10. [Step 8: Adding Set Points (States) to Locations and Devices (NOT YET IMPLEMENTED IN API)](#step-8-adding-set-points-states-to-locations-and-devices-not-yet-implemented-in-api)
+10. [Step 8: Adding Set Points (States) to Locations and Devices](#step-8-adding-set-points-states-to-locations-and-devices)
 
 ## General Concepts
 
@@ -122,13 +122,33 @@ Forecasts must be linked to only one of
 
 ---
 
-## Step 1: Add Location Information (Buildings and Spaces)
+## Step 1: Add Location Information (Sites)
 
-This step can be repeated to add additional buildings at any time. Like other entities, re-posting a building with new fields or updated relations (e.g., new buildingSpaces) will update the existing record rather than create a duplicate.
+This step creates the site entity. You can repeat this step to add more sites at any time. Like other entities, re-posting a site with new fields or updated relations will update the existing record rather than create a duplicate.
+
+Use the endpoint /api/elexia/transformation/site
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "site": {
+    "sourceId": "site_demo_v3",
+    "type": "Site",
+    "name": "Demo Prosumer Site v3",
+    "description": "Prosumer site"
+  }
+}
+```
+
+---
+
+## Step 2: Add Location Information (Buildings and Spaces)
+
+This step can be repeated to add additional buildings at any time. Like other entities, re-posting a building with new fields or updated relations (e.g., new buildingSpaces or sites) will update the existing record rather than create a duplicate.
 
 Use the endpoint /api/elexia/transformation/building
 
-This step creates the building and its associated rooms and walls. The building will be connected to a site in the next step.
+This step creates the building and its associated rooms and walls. The building will be connected to a site using the `sites` array in the payload.
 
 ```json
 {
@@ -145,7 +165,7 @@ This step creates the building and its associated rooms and walls. The building 
       "sourceId": "space_office_v3",
       "type": "BuildingSpace",
       "name": "Office Room v3",
-      "buildingSpaceKind": "Space",
+      "buildingSpaceKind": "Room",
       "area": 60.0,
       "airVolume": 150.0,
       "relatedSourceIds": ["wall_shared_v3"]
@@ -154,7 +174,7 @@ This step creates the building and its associated rooms and walls. The building 
       "sourceId": "space_server_v3",
       "type": "BuildingSpace",
       "name": "Server Room v3",
-      "buildingSpaceKind": "Space",
+      "buildingSpaceKind": "Room",
       "area": 40.0,
       "airVolume": 100.0,
       "relatedSourceIds": ["wall_shared_v3"]
@@ -165,33 +185,17 @@ This step creates the building and its associated rooms and walls. The building 
       "name": "Shared Wall v3",
       "buildingSpaceKind": "Wall"
     }
+  ],
+  "sites": [
+    {
+      "sourceId": "site_demo_v3",
+      "organisationName": "dataprovider_v3"
+    }
   ]
 }
 ```
 
 ---
-
-## Step 2: Add Location Information (Sites)
-
-> **Note:** 
-> The `organisationName` inside the `buildings` list does **not** need to match the root `organisationName`. It refers to the organisation responsible for each referenced building.
-
-Use the endpoint /api/elexia/transformation/site
-
-```json
-{
-  "organisationName": "dataprovider_v3",
-  "site": {
-    "sourceId": "site_demo_v3",
-    "type": "Site",
-    "name": "Demo Prosumer Site v3",
-    "description": "Prosumer site"
-  },
-  "buildings": [{ "sourceId": "bld_demo_v3",
-                  "organisationName": "dataprovider_v3" // Is not needed if it is the same as organisationName in the root
-              }]
-}
-```
 
 ## Step 3: Add Devices
 
@@ -333,11 +337,21 @@ This step shows how to send actual observations to the devices. Each entry conta
         "time": "2025-05-06T08:00:00Z",
         "values": [
           {
-            "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "accumulationKindId": "15e95acc-48b7-4756-a264-c0cac5461125",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d"
+            },
             "value": 22.1
           },
           {
-            "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "accumulationKindId": "15e95acc-48b7-4756-a264-c0cac5461125",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d"
+            },
             "value": 46.5
           }
         ]
@@ -346,11 +360,21 @@ This step shows how to send actual observations to the devices. Each entry conta
         "time": "2025-05-06T09:00:00Z",
         "values": [
           {
-            "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "accumulationKindId": "15e95acc-48b7-4756-a264-c0cac5461125",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d"
+            },
             "value": 22.4
           },
           {
-            "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "accumulationKindId": "15e95acc-48b7-4756-a264-c0cac5461125",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d"
+            },
             "value": 47.0
           }
         ]
@@ -384,38 +408,28 @@ This sub-step shows how to query data for a specific device using the `/api/elex
 #### Example Response
 
 ```json
-{
-  "sourceId": "dev_sensor_v3",
-  "organisationName": "dataprovider_v3",
-  "data": [
+[
     {
-      "time": "2025-05-06T08:00:00Z",
-      "values": [
-        {
-          "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
-          "value": 22.1
-        },
-        {
-          "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
-          "value": 46.5
-        }
-      ]
+        "procedureExecution": "5fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 22.1,
+        "timestamp": "2025-05-06T08:00:00Z"
     },
     {
-      "time": "2025-05-06T09:00:00Z",
-      "values": [
-        {
-          "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
-          "value": 22.4
-        },
-        {
-          "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
-          "value": 47.0
-        }
-      ]
+        "procedureExecution": "6fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 46.5,
+        "timestamp": "2025-05-06T08:00:00Z"
+    },
+    {
+        "procedureExecution": "5fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 22.4,
+        "timestamp": "2025-05-06T09:00:00Z"
+    },
+    {
+        "procedureExecution": "6fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 47.0,
+        "timestamp": "2025-05-06T09:00:00Z"
     }
-  ]
-}
+]
 ```
 
 ### Sub-step 2: Retrieve Observations for a Site and Query Data
@@ -453,7 +467,7 @@ This sub-step allows you to retrieve all observations for a site and query data 
 
 ---
 
-## Step 6: Adding a Weather Area to a Site NOT YET IMPLEMENTED IN API
+## Step 6: Adding a Weather Area to a Site
 
 > **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
@@ -490,7 +504,7 @@ To connect a WeatherArea to a site, include it in the site's list of weather are
 
 > **Note:** A WeatherArea is treated as a location level, just like Building or BuildingSpace. Devices and forecasts may only be connected to a single level of location (site, building, buildingSpace, or weatherArea).
 
-### Adding Devices and Forecasts to a Weather Area - NOT YET IMPLEMENTED IN API
+### Adding Devices and Forecasts to a Weather Area
 
 > **NOTE:** This has not yet been implemented in the API, so untill then data may simply be added directly on the site.
 
@@ -506,8 +520,7 @@ Adding a device to a WeatherArea is done in the same way as for a building or bu
     "dateInstalled": "2024-01-20T00:00:00Z"
   },
   "weatherArea": {
-    "sourceId": "weatherarea_rooftop_v3",
-    "type": "WeatherArea"
+    "sourceId": "weatherarea_rooftop_v3"
   },
   "properties": [
     {
@@ -595,24 +608,72 @@ The payload structure for posting forecast data mimics the structure in Step 4 (
       {
         "time": "2024-01-02T12:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5 },
-          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.0 }
+          { 
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 21.5
+          },
+          { 
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 45.0
+          }
         ], 
         "version": 1
       },
       {
         "time": "2024-01-02T13:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8 },
-          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.0 }
+          { 
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 21.8
+          },
+          { 
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 46.0
+          }
         ], 
         "version": 1 
       },
       {
         "time": "2024-01-02T14:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
-          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.0 }
+          { 
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 22.0
+          },
+          { 
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 47.0
+          }
         ], 
         "version": 1
       }
@@ -632,24 +693,72 @@ The payload structure for posting forecast data mimics the structure in Step 4 (
       {
         "time": "2024-01-02T12:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7 },
-          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.5 }
+          { 
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 21.7
+          },
+          { 
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 45.5
+          }
         ], 
         "version": 2
       },
       {
         "time": "2024-01-02T13:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
-          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.5 }
+          { 
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 22.0
+          },
+          { 
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 46.5
+          }
         ], 
         "version": 2
       },
       {
         "time": "2024-01-02T14:00:00Z",
         "values": [
-          { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3 },
-          { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.5 }
+          { 
+            "property": {
+              "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263",
+              "unitOfMeasureId": "d98e286b-f437-4375-9bbd-ef8cfbc54cb3",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 22.3
+          },
+          { 
+            "property": {
+              "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783",
+              "unitOfMeasureId": "b0a86102-bb5e-41a8-bf7a-b72601a16a12",
+              "aggregationKindId": "f5218a15-9b22-4cc5-94db-4e106bae169d",
+              "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8"
+            },
+            "value": 47.5
+          }
         ], 
         "version": 2
       }
@@ -728,66 +837,87 @@ The payload format for querying forecast data matches the format used for queryi
 > **Note:** The response returns all versions of forecast values for each timestamp and property.
 
 ```json
-{
-  "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "data": [
+[
     {
-      "time": "2024-01-02T12:00:00Z",
-      "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.5 },
-        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.0 }
-      ],
-      "version": 1
+        "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 21.5,
+        "timestamp": "2024-01-02T12:00:00Z",
+        "version": 1
     },
     {
-      "time": "2024-01-02T12:00:00Z",
-      "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.7 },
-        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 45.5 }
-      ],
-      "version": 2
+        "procedureExecution": "4fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 45.0,
+        "timestamp": "2024-01-02T12:00:00Z",
+        "version": 1
     },
     {
-      "time": "2024-01-02T13:00:00Z",
-      "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 21.8 },
-        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.0 }
-      ],
-      "version": 1
+        "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 21.699999999999999,
+        "timestamp": "2024-01-02T12:00:00Z",
+        "version": 2
     },
     {
-      "time": "2024-01-02T13:00:00Z",
-      "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
-        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 46.5 }
-      ],
-      "version": 2
+        "procedureExecution": "4fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 45.5,
+        "timestamp": "2024-01-02T12:00:00Z",
+        "version": 2
     },
     {
-      "time": "2024-01-02T14:00:00Z",
-      "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.0 },
-        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.0 }
-      ],
-      "version": 1
+        "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 21.800000000000001,
+        "timestamp": "2024-01-02T13:00:00Z",
+        "version": 1
     },
     {
-      "time": "2024-01-02T14:00:00Z",
-      "values": [
-        { "propertyId": "8a4e4cac-e568-4b88-8955-e04f65d81263", "value": 22.3 },
-        { "propertyId": "f319f512-13d7-4fc8-b4eb-8da8624d0783", "value": 47.5 }
-      ],
-      "version": 2
+        "procedureExecution": "4fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 46.0,
+        "timestamp": "2024-01-02T13:00:00Z",
+        "version": 1
+    },
+    {
+        "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 22.0,
+        "timestamp": "2024-01-02T13:00:00Z",
+        "version": 2
+    },
+    {
+        "procedureExecution": "4fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 46.5,
+        "timestamp": "2024-01-02T13:00:00Z",
+        "version": 2
+    },
+    {
+        "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 22.0,
+        "timestamp": "2024-01-02T14:00:00Z",
+        "version": 1
+    },
+    {
+        "procedureExecution": "4fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 47.0,
+        "timestamp": "2024-01-02T14:00:00Z",
+        "version": 1
+    },
+    {
+        "procedureExecution": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 22.300000000000001,
+        "timestamp": "2024-01-02T14:00:00Z",
+        "version": 2
+    },
+    {
+        "procedureExecution": "4fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "value": 47.5,
+        "timestamp": "2024-01-02T14:00:00Z",
+        "version": 2
     }
-  ]
-}
+]
 ```
 
 This allows you to post and retrieve forecasted values for properties, supporting advanced analytics and planning.
 
 ---
 
-## Step 8: Adding Set Points (States) to Locations and Devices (NOT YET IMPLEMENTED IN API)
+## Step 8: Adding Set Points (States) to Locations and Devices
 
 Set points (states) can be added to all location entities (Site, Building, BuildingSpace, WeatherArea) and to devices, but not to forecasts. The setup is similar to that of forecasts and devices.
 
@@ -806,49 +936,49 @@ Suppose you want to set a thermal resistance set point for a wall (building spac
   "organisationName": "dataprovider_v3",
   "state": {
     "sourceId": "state_wall_thermal_resistance_v3",
-    "type": "State",
-    "name": "Thermal Resistance Setpoint",
-    "description": "Target thermal resistance for shared wall",
-    "buildingSpace": { "sourceId": "wall_shared_v3" },
-    "properties": {
+    "name": "Wall Thermal Resistance v3",
+    "type": "thermal_property",
+    "description": "Thermal resistance property of the shared wall v3",
+    "string_state": 0
+  },
+  "properties": [
+    {
       "propertyId": "d9a3a205-f71d-4eca-986f-dae225f40958",
       "unitOfMeasureId": "b1d466d6-0c66-4c92-8d00-5cb36b67581d",
       "accumulationKindId": "ba5745a5-9633-406f-ac8c-6f9e4aa0cfd8",
       "aggregationKindId": "e16765d1-e91f-4c57-9e5e-41a2ea2be0fd"
     }
+  ],
+  "buildingSpace": {
+    "sourceId": "wall_server_office_v3",
+    "organisationName": "dataprovider_v3"
   }
 }
 ```
 
 #### 2. Post State Values
 
-**Endpoint:** `POST /api/elexia/transformation/statevalue`
+**Endpoint:** `POST /api/elexia/transformation/state/data`
 
 ```json
 [
   {
     "sourceId": "state_wall_thermal_resistance_v3",
     "organisationName": "dataprovider_v3",
-    "value": 2.7,
-    "timestamp": "2024-01-10T12:00:00Z"
+    "data": [
+      {
+        "timestamp": "2024-01-10T12:00:00+00:00",
+        "value": 2.7
+      }
+    ]
   }
 ]
 ```
 
 #### 3. Query the Latest State Value Before a Timestamp
 
-**Endpoint:** `POST /api/elexia/transformation/statevalue/last`
+**Endpoint:** `GET /api/elexia/transformation/state/data/query/{stateId}/{timestamp}`
 
-```json
-{
-  "sourceId": "state_wall_thermal_resistance_v3",
-  "organisationName": "dataprovider_v3",
-  "timestamp": "2024-01-09T12:00:00Z"
-}
-```
-
-This will return the latest value for the state before or at the given timestamp.
-
-> **Note:** The `properties` field for State must be a single object, not an array, and must include propertyId, unitOfMeasureId, accumulationKindId, and aggregationKindId.
+This will return the latest x values for the state before or at the given timestamp based on the limit used.
 
 - **Returns:** The latest value for the state before or at the given timestamp.

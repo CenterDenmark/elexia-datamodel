@@ -6,7 +6,7 @@ erDiagram
 
 PropertyValue }|--|| Observation: hasResult
 
-PropertyValueInterval }|--|| Observation: hasResult
+%%PropertyValueInterval }|--|| Observation: hasResult
 
 
 %% isMeasuredIn is the inverse
@@ -41,9 +41,13 @@ ForecastObservation }|--|| AccumulationKind: isKindOf
 ForecastObservation }|--|| AggregationKind: isKindOf
 
 %%Device }|--|| DeviceType: deviceSubClass
-Device }|--|| DeviceKind: hasDeviceKind
+Device }|--o| DeviceKind: hasDeviceKind
 
 Device }o--o| Building: contains
+
+Device }o--o| WeatherArea: contains
+
+Site }o--o| WeatherArea: contains
 
 Device }o--o| BuildingSpace: contains
 
@@ -55,6 +59,8 @@ Building }o--|| Site: hasSite
 
 Organisation }|--o| Site: isOwnedBy
 
+Organisation ||--o{ Device: owns
+
 Address }|--o| Site: hasAddress
 
 %% isLocationOf is the inverse of hasLocation
@@ -62,7 +68,9 @@ Building }o--|| Location: isLocationOf
 
 WeatherArea }o--|| Location: isLocationOf
 
-Device }o--|| Location: isLocationOf
+WeatherArea }o--|| Location: isLocationOf
+
+Device }o--o| Location: isLocationOf
 
 BuildingSpace }o--|| Location: isLocationOf
 
@@ -107,8 +115,8 @@ Building {
     float livingArea
     float businessArea
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 BuildingSpace {
@@ -133,13 +141,13 @@ BuildingSpace {
     %% area: in m2
     float area
     string description
-    %% BuildingSpace can be 1 of [ BuildingElementProxy, BuildingStorey, Column, Covering, CurtainWall, Door, OpeningElement, Plate, Railing, Roof, Site, Slab, Space, Stair, StairFlight, Storey, Wall, WallStandardCase, Window ]
+    %% BuildingSpaceKind can be 1 of [ BuildingElementProxy, BuildingStorey, Column, Covering, CurtainWall, Door, OpeningElement, Plate, Railing, Roof, Site, Slab, Space, Stair, StairFlight, Storey, Wall, WallStandardCase, Window ]
     string buildingSpaceKind
     string source
     %%dataProvider: A sequence of characters identifying the provider of the harmonised data entity. Example from Github "IFC file"
     string dataProvider
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Organisation {
@@ -149,8 +157,8 @@ Organisation {
     string description
     string contactPoint
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Site {
@@ -159,17 +167,17 @@ Site {
     string name
     string description
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Location {
     uuid id PK
     string type
-    string value
+    geojson value
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Address {
@@ -190,8 +198,8 @@ Address {
     %% district: A district is a type of administrative division that, in some countries, is managed by the local government
     string district
     string source
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 PropertyValue {
@@ -234,8 +242,8 @@ Property {
     %% name: should correspond to the name after quantityKind: in the associated link
     string name
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 UnitOfMeasure {
@@ -244,8 +252,8 @@ UnitOfMeasure {
     %% name: This should correspond to the name after unit: in the readable lookup
     string name
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 Observation {
@@ -254,25 +262,103 @@ Observation {
     uuid id PK
     string type
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
     %% temporalType: should be Interval or Instant. Property values for instant types are stored in PropertyValue
     string temporalType
+}
+
+AccumulationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AccumulationKind/
+    uuid id PK
+    str name
+}
+
+AggregationKind {
+    %% https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61968/Metering/AggregateKind
+    uuid id PK
+    str name
 }
 
 Meter {
     %% Subclass of device and has all the relations a device has
     uuid id PK
-    %% type: Must be Meter. Is mandatory
+    datetime dateInstalled
+}
+
+Sensor {
+    %% Subclass of device and has all the relations a device has
+    uuid id PK
+    datetime dateInstalled
+}
+
+Photovoltaic {
+    %% Subclass of device and has all the relations a device has
+    uuid id PK
+    %% installed peak power (DC capacity) (kW DC)
+    float installedPeakPower
+    %% inverter capacity (kW AC)
+    float inverterCapacity
+    %% inverter voltage rating (V AC)
+    float inverterVoltageRating
+    %% system loss (%)
+    float systemLoss
+    %% installation position (string description)
+    string installationPosition
+    %% installed area (m2)
+    float installedArea
+    %% installation date (MMYYYY)
+    string dateInstalled
+    %% installation cost (EUR)
+    float installationCost
+    %% expected lifetime (YY)
+    int expectedLifetime
+    %% mount type (string: e.g. roof, fixed, tracking)
+    string mountType
+    %% slope (degrees)
+    float slope
+    %% azimuth (degrees)
+    float azimuth
+    datetime dateCreated
+    datetime dateModified
+}
+
+EV {
+    uuid id PK
+    %% powerCharge: Charging power of EV charger i kW.
+    float powerCharge
+    datetime dateInstalled
+}
+
+
+WeatherArea {
+    uuid id PK
+    str name
+    str description
+    str type
+}
+
+DeviceSubclasses {
+    entity EV
+    entity Meter
+    entity Sensor
+    entity WeatherStation
+    entity HVAC
+    entity Photovoltaics
+}
+
+Device {
+    %% Subclass of device and has all the relations a device has
+    uuid id PK
+    %% type: Meter, HVAC, ect. Corresponds to the child
     string type
     string name
     string description
-    string dateInstalled
     string status
     string source
     %% The dates below refer to creation and modification in this model
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 DeviceKind {
@@ -283,8 +369,8 @@ DeviceKind {
     string modelName
     string manufacturer
     string description
-    string dateCreated
-    string dateModified
+    datetime dateCreated
+    datetime dateModified
 }
 
 ForecastModel {
