@@ -31,6 +31,8 @@ The main entry points for data consumers are the site endpoints:
 
 Start by querying one of these endpoints with the UUID of the site you are interested in.
 
+> **Note:** For large sites, the `/complete` endpoint may timeout. If this happens, please reach out to Center Denmark for support. As a workaround, use the regular site endpoint (without `/complete`) and then query related entities (e.g., buildings, weather areas) individually using their respective endpoints. Please checkout [Exploring Related Entities](#exploring-related-entities) for an example.
+
 ---
 
 ## Site Endpoints
@@ -241,6 +243,106 @@ The response from the site endpoints includes arrays of IDs for related entities
   `GET /api/elexia/transformation/building/{buildingId}`  
   Returns building details and directly related entities.
 
+  **Example response:**
+  ```json
+  {
+    "building": {
+      "id": "445db277-11c5-4eb9-bdcb-82ef27d240d7",
+      "type": "building",
+      "name": "Demo Building v3",
+      "description": "Demo building for v3",
+      "livingArea": 0,
+      "businessArea": 0
+    },
+    "buildingSpaces": [
+      {
+        "id": "de5e8476-e762-4dcc-afc2-0c784d15f665",
+        "type": "buildingSpace",
+        "name": "Shared Wall Server-Office v3",
+        "buildingSpaceKind": "Wall",
+        "airVolume": 0,
+        "area": 0,
+        "relatedSpaceIds": [
+          "846b8f68-cb9d-43a1-9555-7bbfbe272ed9",
+          "b1c3f9e8-a240-45fe-93c4-952aa6d08f2e"
+        ]
+      },
+      {
+        "id": "846b8f68-cb9d-43a1-9555-7bbfbe272ed9",
+        "type": "buildingSpace",
+        "name": "Office Room v3",
+        "buildingSpaceKind": "Room",
+        "airVolume": 0,
+        "area": 0,
+        "relatedSpaceIds": [
+          "67dcdaa8-2283-43ea-9d36-9660cf3108a3",
+          "de5e8476-e762-4dcc-afc2-0c784d15f665"
+        ]
+      },
+      {
+        "id": "b1c3f9e8-a240-45fe-93c4-952aa6d08f2e",
+        "type": "buildingSpace",
+        "name": "Server Room v3",
+        "buildingSpaceKind": "Room",
+        "airVolume": 0,
+        "area": 0,
+        "relatedSpaceIds": [
+          "67dcdaa8-2283-43ea-9d36-9660cf3108a3",
+          "de5e8476-e762-4dcc-afc2-0c784d15f665"
+        ]
+      },
+      {
+        "id": "67dcdaa8-2283-43ea-9d36-9660cf3108a3",
+        "type": "BuildingSpace",
+        "name": "Shared Wall v3",
+        "buildingSpaceKind": "Wall",
+        "airVolume": 0,
+        "area": 0,
+        "relatedSpaceIds": [
+          "846b8f68-cb9d-43a1-9555-7bbfbe272ed9",
+          "b1c3f9e8-a240-45fe-93c4-952aa6d08f2e"
+        ]
+      }
+    ],
+    "deviceIds": [],
+    "weatherAreaIds": [],
+    "siteIds": [
+      "40992cd5-721b-4d5f-bf85-19ae3170dd8e"
+    ],
+    "forecastModelIds": []
+  }
+  ```
+
+  To find devices in a specific building space, use the building space endpoint (`GET /api/elexia/transformation/building/space/{buildingSpaceId}/devices` ). 
+  
+  Example response for devices in a building space:
+  ```json
+  [
+    {
+      "device": {
+        "id": "b08e2aeb-a67e-409d-9061-960fd9d1d2e1",
+        "name": "Main Power Meter v3",
+        "description": "Electricity meter in Office Room v3",
+        "status": "Active"
+      },
+      "deviceSubType": {
+        "type": "METER",
+        "dateInstalled": "2024-01-15T00:00:00Z"
+      },
+      "observations": [
+        {
+          "id": "6d60ddd8-bcb4-40ee-b415-aec965114189",
+          "type": "METER"
+        },
+        {
+          "id": "dc1cefad-5ba4-44e1-918d-9e9872669644",
+          "type": "METER"
+        }
+      ]
+    }
+  ]
+  ```
+
 - **Weather Area:**  
   `GET /api/elexia/transformation/weatherarea/{weatherAreaId}`  
   Returns weather area details and directly related entities.
@@ -362,7 +464,8 @@ GET /api/elexia/transformation/state/data/query/{stateId}/{timestamp}
 ## Best Practices
 
 - **Start with the site endpoints** to discover the structure and related entities.
-- **Use the complete endpoint** for a full recursive view of all entities under a site.
+- **Use the complete endpoint** for a full recursive view of all entities under a site.  
+  *If the complete endpoint times out for large sites, use the regular site endpoint and then query related entities (buildings, weather areas, etc.) by their IDs.*
 - **Follow up with entity-specific endpoints** to get details for buildings, devices, weather areas, forecasts, and states.
 - **Cache context data** locally, as it changes infrequently.
 - **Use UUIDs** from responses to query further details.
