@@ -378,7 +378,7 @@ To understand what a device measures, use:
 - `GET /api/elexia/transformation/device/{deviceId}`
 
 This endpoint returns metadata about the device, including its type, name, and description.  
-**Note:** The current version does not return full observation details for the device. This will be improved in future API updates.
+**Note:** The current version does not return full observation details for the device. This will be improved in future API updates. For other entities, it is possible to query for observations directly, for instance via `GET /api/elexia/transformation/building/{buildingId}/observations`.
 
 ---
 
