@@ -551,15 +551,16 @@ Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast mo
 
 ```json
 {
-  "organisationName": "dataprovider_v3",
-  "sourceId": "forecast_indoor_temp_v3",
-  "name": "Indoor Temperature Forecast Model v3",
-  "modelType": "ML",
-  "modelVersion": "1.0.0",
-  "period": "PT3H",
-  "frequency": "PT1H",
-  "interval": "PT1H",
-  "description": "Forecasts indoor temperature and humidity for Building A in Dokken",
+  "forecastModel": { "organisationName": "dataprovider_v3",
+    "sourceId": "forecast_indoor_temp_v3",
+    "name": "Indoor Temperature Forecast Model v3",
+    "modelType": "ML",
+    "modelVersion": "1.0.0",
+    "period": "PT3H",
+    "frequency": "PT1H",
+    "interval": "PT1H",
+    "description": "Forecasts indoor temperature and humidity for Building A in Dokken"
+    }
   "devices": [
     {
       "sourceId": "dev_sensor_v3",
