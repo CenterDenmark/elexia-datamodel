@@ -86,6 +86,21 @@ Organisation }|--o{ Building: owns
 
 Organisation }|--o{ BuildingSpace: owns
 
+
+%% Relationships for District Heating System
+Site ||--o{ DistrictHeatingSystem: contains
+
+DistrictHeatingSystem ||--o{ HeatingZone: contains
+
+DistrictHeatingSystem |o--o{ Device: contains
+
+HeatingZone |o--o{ Device: contains
+
+HeatingZone |o--o| WeatherArea: hasWeatherArea
+
+
+
+
 Relations {
     %% All relationships in this model will be physically represented as rows in this table
     uuid entityFrom
@@ -169,6 +184,63 @@ Site {
     string source
     datetime dateCreated
     datetime dateModified
+}
+
+DistrictHeatingSystem {
+    uuid id PK
+    string type
+    string name
+    string description
+    string source
+    datetime dateCreated
+    datetime dateModified
+}
+
+HeatingZone {
+    uuid id PK
+    string type
+    string name
+    string description
+    string source
+    datetime dateCreated
+    datetime dateModified
+}
+
+
+Shunt {
+    %% Subclass of Device (id aligns with Device.id)
+    uuid id PK
+
+    %% Shunt-specific attributes (selected from provided list)
+    string note
+    int commissioningYear
+    boolean isMunicipalInLeanHeat
+    boolean isConnectedToMainNetwork
+    string firstSroDataDate
+    string reducedToCurrentTempDate
+
+    int dnAfterShunt
+    int dnAtConnectionPoint
+
+    float electricPowerKw
+    float heatPowerWinterPeakKw
+    float heatPowerSummerPeakKw
+    float pipeLengthAfterShuntM
+
+    string eloverblikMeteringPointId
+    string meterSize
+}
+
+HeatingZoneAggregate {
+    %% Subclass of Device (id aligns with Device.id)
+    uuid id PK
+
+    %% Aggregation device configuration metadata
+    %% (Aggregation semantics remain on Observation via AggregationKind/AccumulationKind)
+    string aggregationMethod
+    string calculationVersion
+    string expectedUpdateFrequency
+    int inputDeviceCount
 }
 
 Location {
@@ -345,6 +417,8 @@ DeviceSubclasses {
     entity WeatherStation
     entity HVAC
     entity Photovoltaics
+    enitty HeatingZoneAggregate
+    entity Shunt
 }
 
 Device {
