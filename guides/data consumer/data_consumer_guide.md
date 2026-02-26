@@ -343,6 +343,135 @@ The response from the site endpoints includes arrays of IDs for related entities
   ]
   ```
 
+## District Heating System Endpoints
+
+These endpoints expose a complete view of district heating topology: the `DistrictHeatingSystem`, its `Shunt`s, primary and secondary metering devices, `HeatingZone`s and devices belonging to zones. The endpoints are written as if available and should return the same information that providers POST (i.e., entities include either `sourceId` + `organisationName` or `id` UUID and all relevant relation fields).
+
+- GET `/api/elexia/transformation/districtheatingsystem/{id}`
+  - Returns the `DistrictHeatingSystem` object and basic references to related `Shunt`s.
+
+- GET `/api/elexia/transformation/districtheatingsystem/{id}/full`
+  - Returns a full, denormalised representation of the system including `shunts`, for each shunt the `primary` and `secondary` devices, its `heatingZones`, and for each heating zone the devices it `contains` and linked `weatherAreas`.
+
+Response shape (example):
+
+```json
+{
+  "districtHeatingSystem": { "id": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab", "name": "District Heat North" },
+  "shunts": [
+    {
+      "shunt": { "id": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab", "name": "Main Shunt" },
+      "primaryDevices": [ { "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" } ],
+      "secondaryDevices": [ { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab", "heatingZone": { "id": "7d9129a5-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 1" } } ],
+      "heatingZones": [
+        {
+          "heatingZone": { "id": "7d9129a5-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 1" },
+          "devices": [ { "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" }, { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab" } ],
+          "weatherAreas": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab" } ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Key rules and expectations for consumers (specification):
+- Entities returned must include either the pair `sourceId` + `organisationName` or the `id` UUID so consumers can reconcile to their local keys.
+- `primaryDevices` are devices that link to a `Shunt` with `relationType: "primaryMeasuredBy"` in the device object.
+- `secondaryDevices` are devices that link to a `Shunt` with `relationType: "secondaryMeasuredBy"` and MUST also include exactly one `heatingZone` reference (this enforces the 1:1 mapping between a secondary meter and its zone).
+- `heatingZones` are returned with their `contains` devices (e.g., aggregation devices) and `measuresFor` device (secondary meter is included both in `shunt.secondaryDevices` and in the relevant `heatingZone.devices` list to make navigation easier).
+- The full endpoint must include device metadata sufficient for consumers to query time series and states (at minimum: `id`, `sourceId`, `organisationName`, `name`, `type`, and any `properties`/observation ids necessary to query data).
+
+Example consumer flow:
+- Call `GET /.../districtheatingsystem/{sourceId}/{organisationName}/full` to obtain the full topology and device ids.
+- Use device `id` to call `/api/elexia/transformation/device/{id}` or to query device time series via `/api/elexia/transformation/device/data/query/id`.
+
+Notes for implementers:
+- The response should be paginated if systems potentially contain many shunts/zones/devices.
+- Maintain consistent relation naming: device→shunt uses `relationType` values `primaryMeasuredBy`/`secondaryMeasuredBy`; zone→shunt is declared on `HeatingZone` as `shunt`.
+
+---
+
+### Entity endpoints: full examples
+
+Below are example GET endpoints and full JSON responses for each entity. These are intended as a specification for implementers and as reference payloads consumers should expect.
+
+1) DistrictHeatingSystem (full)
+
+GET `/api/elexia/transformation/districtheatingsystem/{sourceId}/{organisationName}`
+
+Example response:
+
+```json
+{
+  "districtHeatingSystem": {
+    "id": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab",
+    "type": "DistrictHeatingSystem",
+    "name": "District Heat North",
+    "description": "Primary district heating network for northern campus",
+    "dateCreated": "2024-01-01T00:00:00Z",
+    "dateModified": "2024-06-01T12:00:00Z",
+    "shunts": [ {"id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" } ]
+  }
+}
+```
+
+2) Shunt (full)
+
+GET `/api/elexia/transformation/shunt/{sourceId}/{organisationName}`
+
+Example response:
+
+```json
+{
+  "shunt": {
+    "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab",
+    "type": "Shunt",
+    "note": "Shunt serving north wing",
+    "commissioningYear": 2018,
+    "isConnectedToMainNetwork": true,
+    "dnAfterShunt": 80,
+    "dnAtConnectionPoint": 100,
+    "electricPowerKw": 5.5,
+    "heatPowerWinterPeakKw": 120.0,
+    "pipeLengthAfterShuntM": 45.0,
+    "eloverblikMeteringPointId": "MP-123456",
+    "meterSize": "DN100",
+    "districtHeatingSystem": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab",
+    "dateCreated": "2025-01-01T00:00:00Z",
+    "dateModified": "2025-02-01T00:00:00Z",
+    "primaryDevice": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab",
+    "secondaryDevices": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab", "heatingZone": {"id": "7d9129a8-1c2b-4e3f-3f9b-1234567890ab" } } ]
+  }
+}
+```
+
+3) HeatingZone (full)
+
+GET `/api/elexia/transformation/heatingzone/{sourceId}/{organisationName}`
+
+Example response:
+
+```json
+{
+  "heatingZone": {
+    "id": "7d9129a8-1c2b-4e3f-3f9b-1234567890ab",
+    "type": "HeatingZone",
+    "name": "North Wing Zone 1",
+    "description": "Zone covering north wing offices",
+    "shunt": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab",
+    "weatherAreas": [ { "id": "7d9129a9-1c2b-4e3f-3f9b-1234567890ab" } ],
+    "devices": {
+      "contains": [ { "id": "7d9129b0-1c2b-4e3f-3f9b-1234567890ab"} ],
+      "measuresFor": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab"
+    },
+    "dateCreated": "2024-01-15T09:00:00Z",
+    "dateModified": "2024-06-01T12:00:00Z"
+  }
+}
+```
+
+
 - **Weather Area:**  
   `GET /api/elexia/transformation/weatherarea/{weatherAreaId}`  
   Returns weather area details and directly related entities.

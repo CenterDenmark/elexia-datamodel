@@ -88,15 +88,23 @@ Organisation }|--o{ BuildingSpace: owns
 
 
 %% Relationships for District Heating System
-Site ||--o{ DistrictHeatingSystem: contains
+Site }|--o{ DistrictHeatingSystem: contains
 
-DistrictHeatingSystem ||--o{ HeatingZone: contains
+DistrictHeatingSystem |o--o{ Shunt: contains
 
-DistrictHeatingSystem |o--o{ Device: contains
+Device }o--|| Shunt: primaryMeasuredBy
 
+Device }o--|{ Shunt: secondaryMeasuredBy
+
+HeatingZone }o--|| Shunt: belongsToShunt
+
+%% Makes it possible to have HeatAggregate device for a heating zone and other devices like for critical consumers
 HeatingZone |o--o{ Device: contains
 
-HeatingZone |o--o| WeatherArea: hasWeatherArea
+%% This is for the meter measuring on the secondary side of the shunt for a specific zone
+Device ||--o{ HeatingZone: measuresFor
+
+HeatingZone }o--o{ WeatherArea: hasWeatherArea
 
 
 
@@ -208,13 +216,11 @@ HeatingZone {
 
 
 Shunt {
-    %% Subclass of Device (id aligns with Device.id)
     uuid id PK
 
     %% Shunt-specific attributes (selected from provided list)
     string note
     int commissioningYear
-    boolean isMunicipalInLeanHeat
     boolean isConnectedToMainNetwork
     string firstSroDataDate
     string reducedToCurrentTempDate
@@ -418,7 +424,6 @@ DeviceSubclasses {
     entity HVAC
     entity Photovoltaics
     enitty HeatingZoneAggregate
-    entity Shunt
 }
 
 Device {

@@ -680,6 +680,126 @@ Stores the set point or control value for a state. At any given time, the value 
 
 ---
 
+## District Heating System, Shunt and HeatingZone
+
+This section documents the three entities introduced for district heating topology. For each entity below we list all attributes (with a short description) followed by a complete example JSON payload containing all attributes.
+
+### DistrictHeatingSystem
+- Attributes (all):
+  - `id`: uuid PK — unique identifier assigned by system.
+  - `type`: string — entity type (should be "DistrictHeatingSystem").
+  - `name`: string — human-readable name.
+  - `description`: string — free-text description.
+  - `source`: string — source/origin of the data (provider/system).
+  - `dateCreated`: datetime — creation timestamp.
+  - `dateModified`: datetime — last modification timestamp.
+
+Example (complete):
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "sourceId": "dh_system_01",
+  "id": "11111111-1111-1111-1111-111111111111",
+  "type": "DistrictHeatingSystem",
+  "name": "District Heat North",
+  "description": "Primary district heating network for northern campus",
+  "source": "dh_network_registry",
+  "dateCreated": "2024-01-01T00:00:00Z",
+  "dateModified": "2024-06-01T12:00:00Z"
+}
+```
+
+### Shunt
+- Attributes (all):
+  - `id`: uuid PK — unique identifier.
+  - `type`: string — entity type (should be "Shunt" if used).
+  - `note`: string — free text note about the shunt.
+  - `commissioningYear`: int — year the shunt was commissioned.
+  - `isConnectedToMainNetwork`: boolean — whether connected to the main district network.
+  - `firstSroDataDate`: string — first SRO data date (string as in model).
+  - `reducedToCurrentTempDate`: string — date when reduced-to-current-temperature change occurred.
+  - `dnAfterShunt`: int — nominal diameter after shunt.
+  - `dnAtConnectionPoint`: int — nominal diameter at connection point.
+  - `electricPowerKw`: float — electrical power rating in kW.
+  - `heatPowerWinterPeakKw`: float — winter peak heat power (kW).
+  - `heatPowerSummerPeakKw`: float — summer peak heat power (kW).
+  - `pipeLengthAfterShuntM`: float — pipe length after shunt in metres.
+  - `eloverblikMeteringPointId`: string — vendor-specific metering point id.
+  - `meterSize`: string — meter size description.
+  - `dateCreated`: datetime — creation timestamp.
+  - `dateModified`: datetime — last modification timestamp.
+
+- Relations / special fields (must be provided when posting):
+  - `primaryMeasuredBy`: uuid — identifier (uuid or sourceId) of the single `Device` measuring the primary side. REQUIRED on create/update.
+  - `secondaryMeasuredBy`: array of uuid — identifiers of `Device` entities measuring secondary sides (may be empty).
+  - `distributesTo`: array of uuid — identifiers of `HeatingZone` entities that the shunt distributes to.
+
+Example (complete payload including relation fields):
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "sourceId": "shunt_main_001",
+  "id": "22222222-2222-2222-2222-222222222222",
+  "type": "Shunt",
+  "note": "Shunt serving north wing",
+  "commissioningYear": 2018,
+  "isConnectedToMainNetwork": true,
+  "firstSroDataDate": "2018-05-01",
+  "reducedToCurrentTempDate": "2020-09-01",
+  "dnAfterShunt": 80,
+  "dnAtConnectionPoint": 100,
+  "electricPowerKw": 5.5,
+  "heatPowerWinterPeakKw": 120.0,
+  "heatPowerSummerPeakKw": 60.0,
+  "pipeLengthAfterShuntM": 45.0,
+  "eloverblikMeteringPointId": "MP-123456",
+  "meterSize": "DN100",
+  "primaryMeasuredBy": "33333333-3333-3333-3333-333333333333",
+  "secondaryMeasuredBy": [
+    "44444444-4444-4444-4444-444444444444",
+    "55555555-5555-5555-5555-555555555555"
+  ],
+  "distributesTo": ["66666666-6666-6666-6666-666666666666","77777777-7777-7777-7777-777777777777"],
+  "dateCreated": "2024-01-10T08:00:00Z",
+  "dateModified": "2024-06-01T12:00:00Z"
+}
+```
+
+### HeatingZone
+- Attributes (all):
+  - `id`: uuid PK — unique identifier.
+  - `type`: string — entity type (should be "HeatingZone").
+  - `name`: string — human-readable name.
+  - `description`: string — description or notes.
+  - `weatherAreaId`: array of uuid — identifiers of associated `WeatherArea` entities (may be empty).
+  - `source`: string — source of the data.
+  - `dateCreated`: datetime — creation timestamp.
+  - `dateModified`: datetime — last modification timestamp.
+
+- Relations / usage:
+  - Linked from `Shunt` via `distributesTo` (i.e., `Shunt.distributesTo` -> `HeatingZone`).
+  - Devices that measure the service connection to the heating zone are linked via the `measuresFor` relation (`Device.measuresFor` -> `HeatingZone`).
+  - Devices that measure in the heating zone are linked via `contains` relation (`HeatingZone contains Device`).
+  - `HeatingZone }o--o| WeatherArea: hasWeatherArea` — associate a `WeatherArea` to a `HeatingZone` using the `hasWeatherArea` relation when local weather or forecasts should be applied to the zone.
+
+Example (complete):
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "sourceId": "zone_north_1",
+  "id": "zone_north_1",
+  "type": "HeatingZone",
+  "name": "North Wing Zone 1",
+  "description": "Zone covering north wing offices",
+  "weatherAreaId": ["8888888-8888-8888-8888-888888888888"],
+  "source": "dh_system_01",
+  "dateCreated": "2024-01-15T09:00:00Z",
+  "dateModified": "2024-06-01T12:00:00Z"
+}
+```
+
+---
+
 ## API Reference
 
 For interacting with the data model, it is reccomended to use the tranformation endpoints, but each entity also has its own base endpoint for direct interaction. Use this diagram as reference:
