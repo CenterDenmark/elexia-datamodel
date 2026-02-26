@@ -480,7 +480,6 @@ Example response:
 - **Device:**  
   `GET /api/elexia/transformation/device/{deviceId}`  
   Returns device details.  
-  *Note: Currently, this endpoint does not return full observation details for the device. This will be updated in the future.*
 
   In addition to looking up observations for a device, the device endpoint should also be used to look up **states** and **forecasts** associated with the device. These are not included in the complete site endpoint and must be retrieved via the device endpoint:
 
@@ -507,8 +506,7 @@ To understand what a device measures, use:
 
 - `GET /api/elexia/transformation/device/{deviceId}`
 
-This endpoint returns metadata about the device, including its type, name, and description.  
-**Note:** The current version does not return full observation details for the device. This will be improved in future API updates. For other entities, it is possible to query for observations directly, for instance via `GET /api/elexia/transformation/building/{buildingId}/observations`.
+This endpoint returns metadata about the device, including its type, name, and description. It also includes all observations to be used for queriyng time series data.
 
 ---
 

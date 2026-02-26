@@ -1021,7 +1021,7 @@ Posting notes:
 Notes on metering and relations:
 - The `Shunt` does not carry `primaryMeasuredBy`/`secondaryMeasuredBy` or a `distributesTo` list; the relation between shunt and zones is declared on the `HeatingZone` side.
 - The `Shunt` should include a `districtHeatingSystem` reference when it belongs to a larger district network.
-- Devices are linked to a `Shunt` at device creation. To distinguish primary vs secondary meters, include a `relationType` in the `shunt` reference (for example `PRIMARY` or `SECONDARY`).
+- Devices are linked to a `Shunt` at device creation. To distinguish primary vs secondary meters, include a `relationType` in the `shunt` reference.
 
 To associate heating zones and devices:
 - Create the `Shunt` first.
