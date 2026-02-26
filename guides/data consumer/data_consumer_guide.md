@@ -11,11 +11,12 @@ This guide describes the recommended workflow for retrieving data as a consumer 
 1. [Getting Started](#getting-started)
 2. [Site Endpoints](#site-endpoints)
 3. [Exploring Related Entities](#exploring-related-entities)
-4. [Device Details](#device-details)
-5. [Querying Time Series Data](#querying-time-series-data)
-6. [Getting Latest Value Before Timestamp](#getting-latest-value-before-timestamp)
-7. [Best Practices](#best-practices)
-8. [API Reference](#api-reference)
+4. [District Heating System Endpoints](#district-heating-system-endpoints)
+5. [Device Details](#device-details)
+6. [Querying Time Series Data](#querying-time-series-data)
+7. [Getting Latest Value Before Timestamp](#getting-latest-value-before-timestamp)
+8. [Best Practices](#best-practices)
+9. [API Reference](#api-reference)
 
 ---
 
