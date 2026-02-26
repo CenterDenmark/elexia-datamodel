@@ -412,8 +412,8 @@ Example response:
     "description": "Primary district heating network for northern campus",
     "dateCreated": "2024-01-01T00:00:00Z",
     "dateModified": "2024-06-01T12:00:00Z",
-    "shunts": [ {"id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" } ]
-  }
+  },
+  "shunts": [ {"id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" } ]
 }
 ```
 
@@ -438,12 +438,12 @@ Example response:
     "pipeLengthAfterShuntM": 45.0,
     "eloverblikMeteringPointId": "MP-123456",
     "meterSize": "DN100",
-    "districtHeatingSystem": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab",
     "dateCreated": "2025-01-01T00:00:00Z",
     "dateModified": "2025-02-01T00:00:00Z",
+  },
+    "districtHeatingSystem": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab",
     "primaryDevice": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab",
     "secondaryDevices": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab", "heatingZone": {"id": "7d9129a8-1c2b-4e3f-3f9b-1234567890ab" } } ]
-  }
 }
 ```
 
@@ -460,15 +460,15 @@ Example response:
     "type": "HeatingZone",
     "name": "North Wing Zone 1",
     "description": "Zone covering north wing offices",
+    "dateCreated": "2024-01-15T09:00:00Z",
+    "dateModified": "2024-06-01T12:00:00Z"
+  },
     "shunt": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab",
     "weatherAreas": [ { "id": "7d9129a9-1c2b-4e3f-3f9b-1234567890ab" } ],
     "devices": {
       "contains": [ { "id": "7d9129b0-1c2b-4e3f-3f9b-1234567890ab"} ],
       "measuresFor": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab"
-    },
-    "dateCreated": "2024-01-15T09:00:00Z",
-    "dateModified": "2024-06-01T12:00:00Z"
-  }
+    }
 }
 ```
 

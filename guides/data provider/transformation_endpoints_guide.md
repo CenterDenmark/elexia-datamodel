@@ -989,33 +989,7 @@ This will return the latest x values for the state before or at the given timest
 
 This step shows how to add a `DistrictHeatingSystem` and one or more `Shunt` entities that connect the primary network to secondary heating zones. Note that devices are linked to shunts when devices are created (devices are not embedded in the `Shunt` resource). Also, `HeatingZone` resources declare which `Shunt` they belong to — i.e., the `Shunt` must exist before creating the `HeatingZone`.
 
-Use the endpoint `/api/elexia/transformation/districtheatingsystem` to post the system and `/api/elexia/transformation/shunt` to post shunts. Example `Shunt` payload (note: no `primaryMeasuredBy` on shunt):
-
-```json
-{
-  "organisationName": "dataprovider_v3",
-  "sourceId": "shunt_main_001",
-  "type": "Shunt",
-  "note": "Shunt serving north wing",
-  "commissioningYear": 2018,
-  "isConnectedToMainNetwork": true,
-  "dnAfterShunt": 80,
-  "dnAtConnectionPoint": 100,
-  "electricPowerKw": 5.5,
-  "heatPowerWinterPeakKw": 120.0,
-  "pipeLengthAfterShuntM": 45.0,
-  "eloverblikMeteringPointId": "MP-123456",
-  "meterSize": "DN100",
-  "districtHeatingSystem": { "sourceId": "dh_system_01", "organisationName": "dataprovider_v3"},
-  "dateCreated": "2025-01-01T00:00:00Z",
-  "sites": [
-    {
-      "sourceId": "site_demo_v3",
-      "organisationName": "dataprovider_v3"
-    }
-  ]
-}
-```
+Use the endpoint `/api/elexia/transformation/districtheatingsystem` to post the system and `/api/elexia/transformation/shunt` to post shunts. 
 
 Posting notes:
 Notes on metering and relations:
@@ -1037,11 +1011,13 @@ POST `/api/elexia/transformation/districtheatingsystem`
 ```json
 {
   "organisationName": "dataprovider_v3",
+  "districtheatingsystem": {
   "sourceId": "dh_system_01",
   "type": "DistrictHeatingSystem",
   "name": "District Heat North",
   "description": "Primary district heating network for northern campus",
   "dateCreated": "2024-01-01T00:00:00Z"
+  }
 }
 ```
 
@@ -1052,6 +1028,7 @@ POST `/api/elexia/transformation/shunt`
 ```json
 {
   "organisationName": "dataprovider_v3",
+  "shunt": {
   "sourceId": "shunt_main_001",
   "type": "Shunt",
   "note": "Shunt serving north wing",
@@ -1064,8 +1041,9 @@ POST `/api/elexia/transformation/shunt`
   "pipeLengthAfterShuntM": 45.0,
   "eloverblikMeteringPointId": "MP-123456",
   "meterSize": "DN100",
-  "districtHeatingSystem": { "sourceId": "dh_system_01", "organisationName": "dataprovider_v3"},
   "dateCreated": "2025-01-01T00:00:00Z"
+  },
+  "districtHeatingSystem": { "sourceId": "dh_system_01", "organisationName": "dataprovider_v3"}
 }
 ```
 
@@ -1076,15 +1054,17 @@ POST `/api/elexia/transformation/heatingzone`
 ```json
 {
   "organisationName": "dataprovider_v3",
+  "heatingzone": {
   "sourceId": "zone_north_1",
   "type": "HeatingZone",
   "name": "North Wing Zone 1",
   "description": "Zone covering north wing offices",
+  "dateCreated": "2024-01-15T09:00:00Z"
+  },
   "shunt": { "sourceId": "shunt_main_001", "organisationName": "dataprovider_v3"},
   "weatherAreas": [
     { "sourceId": "weather_rooftop_1", "organisationName": "dataprovider_v3"}
-  ],
-  "dateCreated": "2024-01-15T09:00:00Z"
+  ]
 }
 ```
 
