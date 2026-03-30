@@ -551,7 +551,8 @@ Use the endpoint `/api/elexia/transformation/forecast` to post a new forecast mo
 
 ```json
 {
-  "forecastModel": { "organisationName": "dataprovider_v3",
+   "organisationName": "dataprovider_v3",
+  "forecastModel": { 
     "sourceId": "forecast_indoor_temp_v3",
     "name": "Indoor Temperature Forecast Model v3",
     "modelType": "ML",
