@@ -47,8 +47,6 @@ Device }o--o| Building: contains
 
 Device }o--o| WeatherArea: contains
 
-Site }o--o| WeatherArea: contains
-
 Device }o--o| BuildingSpace: contains
 
 BuildingSpace }o--|| Building: hasSpace
@@ -88,7 +86,7 @@ Organisation }|--o{ BuildingSpace: owns
 
 
 %% Relationships for District Heating System
-Site }|--o{ DistrictHeatingSystem: contains
+Site ||--o{ DistrictHeatingSystem: contains
 
 DistrictHeatingSystem |o--o{ Shunt: contains
 
@@ -98,6 +96,8 @@ Device }o--|{ Shunt: secondaryMeasuredBy
 
 HeatingZone }o--|| Shunt: belongsToShunt
 
+ForecastModel }o--|| Shunt: hasForecast
+
 %% Makes it possible to have HeatAggregate device for a heating zone and other devices like for critical consumers
 HeatingZone |o--o{ Device: contains
 
@@ -105,6 +105,8 @@ HeatingZone |o--o{ Device: contains
 Device ||--o{ HeatingZone: measuresFor
 
 HeatingZone }o--o{ WeatherArea: hasWeatherArea
+
+ForecastModel }o--|| HeatingZone: hasForecast
 
 
 
@@ -516,6 +518,8 @@ StateValue {
 State }|--|| Device: isStateOf
 State }|--|| Building: isStateOf
 State }|--|| BuildingSpace: isStateOf
+State }|--|| Shunt: isStateOf
+State }|--|| HeatingZone: isStateOf
 State }|--|| Site: isStateOf
 State }|--|| WeatherArea: isStateOf
 StateValue }|--|| State: hasState
