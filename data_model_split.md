@@ -169,7 +169,6 @@ HeatingZone {
 HeatingZoneAggregate {
     %% Subclass of Device — id aligns with Device.id
     uuid id PK
-    string aggregationMethod
     string calculationVersion
     string expectedUpdateFrequency
     int inputDeviceCount
@@ -250,7 +249,6 @@ EV {
 
 HeatingZoneAggregate {
     uuid id PK
-    string aggregationMethod
     string calculationVersion
     string expectedUpdateFrequency
     int inputDeviceCount

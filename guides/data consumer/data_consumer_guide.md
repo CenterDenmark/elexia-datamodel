@@ -354,7 +354,7 @@ These endpoints expose a complete view of district heating topology: the `Distri
 - GET `/api/elexia/transformation/districtheatingsystem/{id}/full`
   - Returns a full, denormalised representation of the system including `shunts`, for each shunt the `primary` and `secondary` devices, its `heatingZones`, and for each heating zone the devices it `contains` and linked `weatherAreas`.
 
-Response shape (example):
+Response shape (example) — two heating zones sharing a `HeatingZoneAggregate` device. The same `id` appearing in both `heatingZones[].devices` lists with `type: "HEATING_ZONE_AGGREGATE"` identifies zones that share the same aggregate:
 
 ```json
 {
@@ -362,12 +362,26 @@ Response shape (example):
   "shunts": [
     {
       "shunt": { "id": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab", "name": "Main Shunt" },
-      "primaryDevices": [ { "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" } ],
-      "secondaryDevices": [ { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab", "heatingZone": { "id": "7d9129a5-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 1" } } ],
+      "primaryDevices": [ { "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab", "type": "METER" } ],
+      "secondaryDevices": [
+        { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab", "type": "METER", "heatingZone": { "id": "7d9129a5-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 1" } },
+        { "id": "7d9129ac-1c2b-4e3f-3f9b-1234567890ab", "type": "METER", "heatingZone": { "id": "7d9129ab-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 2" } }
+      ],
       "heatingZones": [
         {
           "heatingZone": { "id": "7d9129a5-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 1" },
-          "devices": [ { "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" }, { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab" } ],
+          "devices": [
+            { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab", "type": "METER" },
+            { "id": "7d9129b1-1c2b-4e3f-3f9b-1234567890ab", "type": "HEATING_ZONE_AGGREGATE" }
+          ],
+          "weatherAreas": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab" } ]
+        },
+        {
+          "heatingZone": { "id": "7d9129ab-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 2" },
+          "devices": [
+            { "id": "7d9129ac-1c2b-4e3f-3f9b-1234567890ab", "type": "METER" },
+            { "id": "7d9129b1-1c2b-4e3f-3f9b-1234567890ab", "type": "HEATING_ZONE_AGGREGATE" }
+          ],
           "weatherAreas": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab" } ]
         }
       ]
@@ -381,6 +395,9 @@ Key rules and expectations for consumers (specification):
 - `primaryDevices` are devices that link to a `Shunt` with `relationType: "primaryMeasuredBy"` in the device object.
 - `secondaryDevices` are devices that link to a `Shunt` with `relationType: "secondaryMeasuredBy"` and MUST also include exactly one `heatingZone` reference (this enforces the 1:1 mapping between a secondary meter and its zone).
 - `heatingZones` are returned with their `contains` devices (e.g., aggregation devices) and `measuresFor` device (secondary meter is included both in `shunt.secondaryDevices` and in the relevant `heatingZone.devices` list to make navigation easier).
+- `HeatingZoneAggregate` devices (`type: "HEATING_ZONE_AGGREGATE"`) are a subclass of `Device` that aggregate measurements across multiple heating zones. The `HeatingZoneAggregate`-specific subclass attributes (e.g., `aggregationMethod`, `calculationVersion`, `inputDeviceCount`) are not yet fully implemented; only the device→heatingZone relation is currently available. A `HeatingZoneAggregate` covering multiple zones will appear with the same `id` in each of those zones' `devices` lists — matching `id` values across zones indicate a shared aggregate.
+- Device `type` is included on all entries in `heatingZones[].devices`, `primaryDevices`, and `secondaryDevices` to allow identification of device kinds (e.g., `METER`, `HEATING_ZONE_AGGREGATE`) without fetching each device individually.
+- The `relationType` field (`"primaryMeasuredBy"` or `"secondaryMeasuredBy"`) on a device's `shunt` reference is what determines placement in `primaryDevices` vs `secondaryDevices` in the response.
 - The full endpoint must include device metadata sufficient for consumers to query time series and states (at minimum: `id`, `sourceId`, `organisationName`, `name`, `type`, and any `properties`/observation ids necessary to query data).
 
 Example consumer flow:
@@ -466,7 +483,7 @@ Example response:
     "shunt": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab",
     "weatherAreas": [ { "id": "7d9129a9-1c2b-4e3f-3f9b-1234567890ab" } ],
     "devices": {
-      "contains": [ { "id": "7d9129b0-1c2b-4e3f-3f9b-1234567890ab"} ],
+      "contains": [ { "id": "7d9129b0-1c2b-4e3f-3f9b-1234567890ab", "type": "HEATING_ZONE_AGGREGATE" } ],
       "measuresFor": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab"
     }
 }

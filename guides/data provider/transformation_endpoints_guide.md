@@ -1109,5 +1109,33 @@ Secondary meter link to shunt as secondaryMeasuredBy and to a heating zone(This 
 
 This keeps device lifecycle separate from topology objects while allowing clear links between devices and zones/shunts via `shunt` (with `relationType`), `heatingZone`, or entries in the `Relations` table.
 
+5) Create `HeatingZoneAggregate` device linked to multiple `HeatingZone`s (example)
+
+> **NOTE:** The `HeatingZoneAggregate` device subclass attributes (e.g., `aggregationMethod`, `calculationVersion`, `inputDeviceCount`) are not yet fully implemented in the API. Only the device→heating zone relation (`heatingZones`) is currently available. Post the device with `deviceType: "HEATING_ZONE_AGGREGATE"` and a `heatingZones` array listing all zones the aggregate covers. All zones referenced must already exist. Standard device fields (`name`, `status`, `properties`, etc.) apply as normal.
+
+POST `/api/elexia/transformation/device`
+
+```json
+{
+  "sourceId": "agg_north_zones_1_2",
+  "organisationName": "dataprovider_v3",
+  "name": "North Wing Aggregate Zone 1+2",
+  "description": "Aggregation device covering North Wing Zones 1 and 2",
+  "status": "Active",
+  "type": {
+    "deviceType": "HEATING_ZONE_AGGREGATE",
+    "calculationVersion": "1.0.0",
+    "expectedUpdateFrequency": "PT1H",
+    "inputDeviceCount": 2
+  },
+  "deviceKind": { "sourceId": "kind_hza_v1", "type": "DeviceKind", "modelName": "HZA-v1", "manufacturer": "Internal" },
+  "heatingZones": [
+    { "sourceId": "zone_north_1", "organisationName": "dataprovider_v3" },
+    { "sourceId": "zone_north_2", "organisationName": "dataprovider_v3" }
+  ],
+  "properties": [ /* ... */ ]
+}
+```
+
 Notes:
 - When referencing existing objects you may provide either the pair `sourceId` + `organisationName` (recommended for new objects) or the internal `id` (UUID) directly, e.g. `"shunt": { "id": "<uuid>", "relationType": "primaryMeasuredBy" }`.

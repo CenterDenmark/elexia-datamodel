@@ -245,7 +245,6 @@ HeatingZoneAggregate {
 
     %% Aggregation device configuration metadata
     %% (Aggregation semantics remain on Observation via AggregationKind/AccumulationKind)
-    string aggregationMethod
     string calculationVersion
     string expectedUpdateFrequency
     int inputDeviceCount
