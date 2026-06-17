@@ -16,6 +16,7 @@
 8. [Step 6: Adding a Weather Area to a Site](#step-6-adding-a-weather-area-to-a-site)
 9. [Step 7: Forecasting Data](#step-7-forecasting-data)
 10. [Step 8: Adding Set Points (States) to Locations and Devices](#step-8-adding-set-points-states-to-locations-and-devices)
+11. [Step 9: Add District Heating System and Shunts](#step-9-add-district-heating-system-and-shunts)
 
 ## General Concepts
 
@@ -194,8 +195,6 @@ This step creates the building and its associated rooms and walls. The building 
   ]
 }
 ```
-
----
 
 ## Step 3: Add Devices
 
@@ -984,3 +983,160 @@ Suppose you want to set a thermal resistance set point for a wall (building spac
 This will return the latest x values for the state before or at the given timestamp based on the limit used.
 
 - **Returns:** The latest value for the state before or at the given timestamp.
+
+---
+
+## Step 9: Add District Heating System and Shunts
+
+This step shows how to add a `DistrictHeatingSystem` and one or more `Shunt` entities that connect the primary network to secondary heating zones. Note that devices are linked to shunts when devices are created (devices are not embedded in the `Shunt` resource). Also, `HeatingZone` resources declare which `Shunt` they belong to — i.e., the `Shunt` must exist before creating the `HeatingZone`.
+
+Use the endpoint `/api/elexia/transformation/districtheatingsystem` to post the system and `/api/elexia/transformation/shunt` to post shunts. 
+
+Posting notes:
+Notes on metering and relations:
+- The `Shunt` does not carry `primaryMeasuredBy`/`secondaryMeasuredBy` or a `distributesTo` list; the relation between shunt and zones is declared on the `HeatingZone` side.
+- The `Shunt` should include a `districtHeatingSystem` reference when it belongs to a larger district network.
+- Devices are linked to a `Shunt` at device creation. To distinguish primary vs secondary meters, include a `relationType` in the `shunt` reference.
+
+To associate heating zones and devices:
+- Create the `Shunt` first.
+- Create `HeatingZone` entities and reference the `Shunt` from the `HeatingZone` payload via a `shunt` field (this establishes the Shunt→HeatingZone link from the HeatingZone side).
+- Devices that measure or serve a `HeatingZone` or a `Shunt` are created via the `/api/elexia/transformation/device` endpoint and can include either `heatingZone` or `shunt` references in their payload.
+
+Additional examples and notes
+
+1) Create `DistrictHeatingSystem` (example)
+
+POST `/api/elexia/transformation/districtheatingsystem`
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "districtheatingsystem": {
+  "sourceId": "dh_system_01",
+  "type": "DistrictHeatingSystem",
+  "name": "District Heat North",
+  "description": "Primary district heating network for northern campus",
+  "dateCreated": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+2) Create `Shunt` (example — shunt references DistrictHeatingSystem)
+
+POST `/api/elexia/transformation/shunt`
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "shunt": {
+  "sourceId": "shunt_main_001",
+  "type": "Shunt",
+  "note": "Shunt serving north wing",
+  "commissioningYear": 2018,
+  "isConnectedToMainNetwork": true,
+  "dnAfterShunt": 80,
+  "dnAtConnectionPoint": 100,
+  "electricPowerKw": 5.5,
+  "heatPowerWinterPeakKw": 120.0,
+  "pipeLengthAfterShuntM": 45.0,
+  "eloverblikMeteringPointId": "MP-123456",
+  "meterSize": "DN100",
+  "dateCreated": "2025-01-01T00:00:00Z"
+  },
+  "districtHeatingSystem": { "sourceId": "dh_system_01", "organisationName": "dataprovider_v3"}
+}
+```
+
+3) Create `HeatingZone` (example — references existing `Shunt` and optional existing `WeatherArea`(s))
+
+POST `/api/elexia/transformation/heatingzone`
+
+```json
+{
+  "organisationName": "dataprovider_v3",
+  "heatingzone": {
+  "sourceId": "zone_north_1",
+  "type": "HeatingZone",
+  "name": "North Wing Zone 1",
+  "description": "Zone covering north wing offices",
+  "dateCreated": "2024-01-15T09:00:00Z"
+  },
+  "shunt": { "sourceId": "shunt_main_001", "organisationName": "dataprovider_v3"},
+  "weatherAreas": [
+    { "sourceId": "weather_rooftop_1", "organisationName": "dataprovider_v3"}
+  ]
+}
+```
+
+Notes:
+- The `Shunt` referenced by `HeatingZone.shunt` must already exist.
+- The `Shunt` referenced by `HeatingZone.shunt` must already exist. The `HeatingZone` defines the relationship to the `Shunt` (i.e., which zones belong to which shunt).
+- Any `WeatherArea` referenced in `weatherAreas` must already exist. You may include multiple entries in the `weatherAreas` array.
+
+4) Create devices and link to `Shunt` (examples)
+
+POST `/api/elexia/transformation/device`
+
+
+Primary meter (link to shunt as primaryMeasuredBy):
+
+```json
+{
+  "sourceId": "meter_primary_001",
+  "organisationName": "dataprovider_v3",
+  "name": "Primary Meter at Shunt Main 001",
+  "type": { "deviceType": "METER", "dateInstalled": "2024-01-15T00:00:00Z" },
+  "deviceKind": { "sourceId": "kind_meter_x200_v3", "type": "DeviceKind" },
+  "shunt": { "sourceId": "shunt_main_001", "organisationName": "dataprovider_v3", "relationType": "primaryMeasuredBy" },
+  "properties": [ /* ... */ ]
+}
+```
+
+Secondary meter link to shunt as secondaryMeasuredBy and to a heating zone(This combination is a requirement for secondary meters):
+
+```json
+{
+  "sourceId": "meter_zone_1",
+  "organisationName": "dataprovider_v3",
+  "name": "Zone 1 Secondary Meter",
+  "type": { "deviceType": "METER", "dateInstalled": "2024-01-15T00:00:00Z" },
+  "deviceKind": { "sourceId": "kind_meter_x200_v3", "type": "DeviceKind" },
+  "shunt": { "sourceId": "shunt_main_001", "organisationName": "dataprovider_v3", "relationType": "secondaryMeasuredBy" },
+  "heatingZone": { "sourceId": "zone_north_1", "organisationName": "dataprovider_v3" },
+  "properties": [ /* ... */ ]
+}
+```
+
+This keeps device lifecycle separate from topology objects while allowing clear links between devices and zones/shunts via `shunt` (with `relationType`), `heatingZone`, or entries in the `Relations` table.
+
+5) Create `HeatingZoneAggregate` device linked to multiple `HeatingZone`s (example)
+
+> **NOTE:** The `HeatingZoneAggregate` device subclass attributes (e.g., `aggregationMethod`, `calculationVersion`, `inputDeviceCount`) are not yet fully implemented in the API. Only the device→heating zone relation (`heatingZones`) is currently available. Post the device with `deviceType: "HEATING_ZONE_AGGREGATE"` and a `heatingZones` array listing all zones the aggregate covers. All zones referenced must already exist. Standard device fields (`name`, `status`, `properties`, etc.) apply as normal.
+
+POST `/api/elexia/transformation/device`
+
+```json
+{
+  "sourceId": "agg_north_zones_1_2",
+  "organisationName": "dataprovider_v3",
+  "name": "North Wing Aggregate Zone 1+2",
+  "description": "Aggregation device covering North Wing Zones 1 and 2",
+  "status": "Active",
+  "type": {
+    "deviceType": "HEATING_ZONE_AGGREGATE",
+    "calculationVersion": "1.0.0",
+    "expectedUpdateFrequency": "PT1H",
+    "inputDeviceCount": 2
+  },
+  "deviceKind": { "sourceId": "kind_hza_v1", "type": "DeviceKind", "modelName": "HZA-v1", "manufacturer": "Internal" },
+  "heatingZones": [
+    { "sourceId": "zone_north_1", "organisationName": "dataprovider_v3" },
+    { "sourceId": "zone_north_2", "organisationName": "dataprovider_v3" }
+  ],
+  "properties": [ /* ... */ ]
+}
+```
+
+Notes:
+- When referencing existing objects you may provide either the pair `sourceId` + `organisationName` (recommended for new objects) or the internal `id` (UUID) directly, e.g. `"shunt": { "id": "<uuid>", "relationType": "primaryMeasuredBy" }`.

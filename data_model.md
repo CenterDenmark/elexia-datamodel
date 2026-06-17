@@ -47,8 +47,6 @@ Device }o--o| Building: contains
 
 Device }o--o| WeatherArea: contains
 
-Site }o--o| WeatherArea: contains
-
 Device }o--o| BuildingSpace: contains
 
 BuildingSpace }o--|| Building: hasSpace
@@ -85,6 +83,33 @@ Site ||--|| Location: hasLocation
 Organisation }|--o{ Building: owns
 
 Organisation }|--o{ BuildingSpace: owns
+
+
+%% Relationships for District Heating System
+Site ||--o{ DistrictHeatingSystem: contains
+
+DistrictHeatingSystem |o--o{ Shunt: contains
+
+Device }o--|| Shunt: primaryMeasuredBy
+
+Device }o--|{ Shunt: secondaryMeasuredBy
+
+HeatingZone }o--|| Shunt: belongsToShunt
+
+ForecastModel }o--|| Shunt: hasForecast
+
+%% Makes it possible to have HeatAggregate device for a heating zone and other devices like for critical consumers
+HeatingZone |o--o{ Device: contains
+
+%% This is for the meter measuring on the secondary side of the shunt for a specific zone
+Device ||--o{ HeatingZone: measuresFor
+
+HeatingZone }o--o{ WeatherArea: hasWeatherArea
+
+ForecastModel }o--|| HeatingZone: hasForecast
+
+
+
 
 Relations {
     %% All relationships in this model will be physically represented as rows in this table
@@ -169,6 +194,60 @@ Site {
     string source
     datetime dateCreated
     datetime dateModified
+}
+
+DistrictHeatingSystem {
+    uuid id PK
+    string type
+    string name
+    string description
+    string source
+    datetime dateCreated
+    datetime dateModified
+}
+
+HeatingZone {
+    uuid id PK
+    string type
+    string name
+    string description
+    string source
+    datetime dateCreated
+    datetime dateModified
+}
+
+
+Shunt {
+    uuid id PK
+
+    %% Shunt-specific attributes (selected from provided list)
+    string note
+    int commissioningYear
+    boolean isConnectedToMainNetwork
+    string firstSroDataDate
+    string reducedToCurrentTempDate
+
+    int dnAfterShunt
+    int dnAtConnectionPoint
+
+    float electricPowerKw
+    float heatPowerWinterPeakKw
+    float heatPowerSummerPeakKw
+    float pipeLengthAfterShuntM
+
+    string eloverblikMeteringPointId
+    string meterSize
+}
+
+HeatingZoneAggregate {
+    %% Subclass of Device (id aligns with Device.id)
+    uuid id PK
+
+    %% Aggregation device configuration metadata
+    %% (Aggregation semantics remain on Observation via AggregationKind/AccumulationKind)
+    string calculationVersion
+    string expectedUpdateFrequency
+    int inputDeviceCount
 }
 
 Location {
@@ -345,6 +424,7 @@ DeviceSubclasses {
     entity WeatherStation
     entity HVAC
     entity Photovoltaics
+    enitty HeatingZoneAggregate
 }
 
 Device {
@@ -437,6 +517,8 @@ StateValue {
 State }|--|| Device: isStateOf
 State }|--|| Building: isStateOf
 State }|--|| BuildingSpace: isStateOf
+State }|--|| Shunt: isStateOf
+State }|--|| HeatingZone: isStateOf
 State }|--|| Site: isStateOf
 State }|--|| WeatherArea: isStateOf
 StateValue }|--|| State: hasState

@@ -11,11 +11,12 @@ This guide describes the recommended workflow for retrieving data as a consumer 
 1. [Getting Started](#getting-started)
 2. [Site Endpoints](#site-endpoints)
 3. [Exploring Related Entities](#exploring-related-entities)
-4. [Device Details](#device-details)
-5. [Querying Time Series Data](#querying-time-series-data)
-6. [Getting Latest Value Before Timestamp](#getting-latest-value-before-timestamp)
-7. [Best Practices](#best-practices)
-8. [API Reference](#api-reference)
+4. [District Heating System Endpoints](#district-heating-system-endpoints)
+5. [Device Details](#device-details)
+6. [Querying Time Series Data](#querying-time-series-data)
+7. [Getting Latest Value Before Timestamp](#getting-latest-value-before-timestamp)
+8. [Best Practices](#best-practices)
+9. [API Reference](#api-reference)
 
 ---
 
@@ -343,6 +344,152 @@ The response from the site endpoints includes arrays of IDs for related entities
   ]
   ```
 
+## District Heating System Endpoints
+
+These endpoints expose a complete view of district heating topology: the `DistrictHeatingSystem`, its `Shunt`s, primary and secondary metering devices, `HeatingZone`s and devices belonging to zones. The endpoints are written as if available and should return the same information that providers POST (i.e., entities include either `sourceId` + `organisationName` or `id` UUID and all relevant relation fields).
+
+- GET `/api/elexia/transformation/districtheatingsystem/{id}`
+  - Returns the `DistrictHeatingSystem` object and basic references to related `Shunt`s.
+
+- GET `/api/elexia/transformation/districtheatingsystem/{id}/full`
+  - Returns a full, denormalised representation of the system including `shunts`, for each shunt the `primary` and `secondary` devices, its `heatingZones`, and for each heating zone the devices it `contains` and linked `weatherAreas`.
+
+Response shape (example) — two heating zones sharing a `HeatingZoneAggregate` device. The same `id` appearing in both `heatingZones[].devices` lists with `type: "HEATING_ZONE_AGGREGATE"` identifies zones that share the same aggregate:
+
+```json
+{
+  "districtHeatingSystem": { "id": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab", "name": "District Heat North" },
+  "shunts": [
+    {
+      "shunt": { "id": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab", "name": "Main Shunt" },
+      "primaryDevices": [ { "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab", "type": "METER" } ],
+      "secondaryDevices": [
+        { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab", "type": "METER", "heatingZone": { "id": "7d9129a5-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 1" } },
+        { "id": "7d9129ac-1c2b-4e3f-3f9b-1234567890ab", "type": "METER", "heatingZone": { "id": "7d9129ab-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 2" } }
+      ],
+      "heatingZones": [
+        {
+          "heatingZone": { "id": "7d9129a5-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 1" },
+          "devices": [
+            { "id": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab", "type": "METER" },
+            { "id": "7d9129b1-1c2b-4e3f-3f9b-1234567890ab", "type": "HEATING_ZONE_AGGREGATE" }
+          ],
+          "weatherAreas": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab" } ]
+        },
+        {
+          "heatingZone": { "id": "7d9129ab-1c2b-4e3f-8a9b-1234567890ab", "name": "North Wing Zone 2" },
+          "devices": [
+            { "id": "7d9129ac-1c2b-4e3f-3f9b-1234567890ab", "type": "METER" },
+            { "id": "7d9129b1-1c2b-4e3f-3f9b-1234567890ab", "type": "HEATING_ZONE_AGGREGATE" }
+          ],
+          "weatherAreas": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab" } ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Key rules and expectations for consumers (specification):
+- Entities returned must include either the pair `sourceId` + `organisationName` or the `id` UUID so consumers can reconcile to their local keys.
+- `primaryDevices` are devices that link to a `Shunt` with `relationType: "primaryMeasuredBy"` in the device object.
+- `secondaryDevices` are devices that link to a `Shunt` with `relationType: "secondaryMeasuredBy"` and MUST also include exactly one `heatingZone` reference (this enforces the 1:1 mapping between a secondary meter and its zone).
+- `heatingZones` are returned with their `contains` devices (e.g., aggregation devices) and `measuresFor` device (secondary meter is included both in `shunt.secondaryDevices` and in the relevant `heatingZone.devices` list to make navigation easier).
+- `HeatingZoneAggregate` devices (`type: "HEATING_ZONE_AGGREGATE"`) are a subclass of `Device` that aggregate measurements across multiple heating zones. The `HeatingZoneAggregate`-specific subclass attributes (e.g., `aggregationMethod`, `calculationVersion`, `inputDeviceCount`) are not yet fully implemented; only the device→heatingZone relation is currently available. A `HeatingZoneAggregate` covering multiple zones will appear with the same `id` in each of those zones' `devices` lists — matching `id` values across zones indicate a shared aggregate.
+- Device `type` is included on all entries in `heatingZones[].devices`, `primaryDevices`, and `secondaryDevices` to allow identification of device kinds (e.g., `METER`, `HEATING_ZONE_AGGREGATE`) without fetching each device individually.
+- The `relationType` field (`"primaryMeasuredBy"` or `"secondaryMeasuredBy"`) on a device's `shunt` reference is what determines placement in `primaryDevices` vs `secondaryDevices` in the response.
+- The full endpoint must include device metadata sufficient for consumers to query time series and states (at minimum: `id`, `sourceId`, `organisationName`, `name`, `type`, and any `properties`/observation ids necessary to query data).
+
+Example consumer flow:
+- Call `GET /.../districtheatingsystem/{sourceId}/{organisationName}/full` to obtain the full topology and device ids.
+- Use device `id` to call `/api/elexia/transformation/device/{id}` or to query device time series via `/api/elexia/transformation/device/data/query/id`.
+
+Notes for implementers:
+- The response should be paginated if systems potentially contain many shunts/zones/devices.
+- Maintain consistent relation naming: device→shunt uses `relationType` values `primaryMeasuredBy`/`secondaryMeasuredBy`; zone→shunt is declared on `HeatingZone` as `shunt`.
+
+---
+
+### Entity endpoints: full examples
+
+Below are example GET endpoints and full JSON responses for each entity. These are intended as a specification for implementers and as reference payloads consumers should expect.
+
+1) DistrictHeatingSystem (full)
+
+GET `/api/elexia/transformation/districtheatingsystem/{sourceId}/{organisationName}`
+
+Example response:
+
+```json
+{
+  "districtHeatingSystem": {
+    "id": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab",
+    "type": "DistrictHeatingSystem",
+    "name": "District Heat North",
+    "description": "Primary district heating network for northern campus",
+    "dateCreated": "2024-01-01T00:00:00Z",
+    "dateModified": "2024-06-01T12:00:00Z",
+  },
+  "shunts": [ {"id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab" } ]
+}
+```
+
+2) Shunt (full)
+
+GET `/api/elexia/transformation/shunt/{sourceId}/{organisationName}`
+
+Example response:
+
+```json
+{
+  "shunt": {
+    "id": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab",
+    "type": "Shunt",
+    "note": "Shunt serving north wing",
+    "commissioningYear": 2018,
+    "isConnectedToMainNetwork": true,
+    "dnAfterShunt": 80,
+    "dnAtConnectionPoint": 100,
+    "electricPowerKw": 5.5,
+    "heatPowerWinterPeakKw": 120.0,
+    "pipeLengthAfterShuntM": 45.0,
+    "eloverblikMeteringPointId": "MP-123456",
+    "meterSize": "DN100",
+    "dateCreated": "2025-01-01T00:00:00Z",
+    "dateModified": "2025-02-01T00:00:00Z",
+  },
+    "districtHeatingSystem": "7d9129a4-1c2b-4e3f-8a9b-1234567890ab",
+    "primaryDevice": "7d9129a6-1c2b-4e3f-3f9b-1234567890ab",
+    "secondaryDevices": [ { "id": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab", "heatingZone": {"id": "7d9129a8-1c2b-4e3f-3f9b-1234567890ab" } } ]
+}
+```
+
+3) HeatingZone (full)
+
+GET `/api/elexia/transformation/heatingzone/{sourceId}/{organisationName}`
+
+Example response:
+
+```json
+{
+  "heatingZone": {
+    "id": "7d9129a8-1c2b-4e3f-3f9b-1234567890ab",
+    "type": "HeatingZone",
+    "name": "North Wing Zone 1",
+    "description": "Zone covering north wing offices",
+    "dateCreated": "2024-01-15T09:00:00Z",
+    "dateModified": "2024-06-01T12:00:00Z"
+  },
+    "shunt": "7d9129a5-1c2b-4e3f-3f9b-1234567890ab",
+    "weatherAreas": [ { "id": "7d9129a9-1c2b-4e3f-3f9b-1234567890ab" } ],
+    "devices": {
+      "contains": [ { "id": "7d9129b0-1c2b-4e3f-3f9b-1234567890ab", "type": "HEATING_ZONE_AGGREGATE" } ],
+      "measuresFor": "7d9129a7-1c2b-4e3f-3f9b-1234567890ab"
+    }
+}
+```
+
+
 - **Weather Area:**  
   `GET /api/elexia/transformation/weatherarea/{weatherAreaId}`  
   Returns weather area details and directly related entities.
@@ -350,7 +497,6 @@ The response from the site endpoints includes arrays of IDs for related entities
 - **Device:**  
   `GET /api/elexia/transformation/device/{deviceId}`  
   Returns device details.  
-  *Note: Currently, this endpoint does not return full observation details for the device. This will be updated in the future.*
 
   In addition to looking up observations for a device, the device endpoint should also be used to look up **states** and **forecasts** associated with the device. These are not included in the complete site endpoint and must be retrieved via the device endpoint:
 
@@ -377,8 +523,7 @@ To understand what a device measures, use:
 
 - `GET /api/elexia/transformation/device/{deviceId}`
 
-This endpoint returns metadata about the device, including its type, name, and description.  
-**Note:** The current version does not return full observation details for the device. This will be improved in future API updates. For other entities, it is possible to query for observations directly, for instance via `GET /api/elexia/transformation/building/{buildingId}/observations`.
+This endpoint returns metadata about the device, including its type, name, and description. It also includes all observations to be used for queriyng time series data.
 
 ---
 
